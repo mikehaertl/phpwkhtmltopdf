@@ -7,7 +7,7 @@ The wkhtmltopdf binary must be installed and working on your system. The static
 binary is preferred but this class should also work with the non static version,
 even though a lot of features will be missing.
 
-This project is sponsored by [PeoplePerHour](http://www.peopleperhour.com PeoplePerHour).
+This project is sponsored by [PeoplePerHour](http://www.peopleperhour.com).
 
 ## Basic use
 
