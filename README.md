@@ -69,6 +69,7 @@ add the margins through CSS. We can also use `cm` in CSS as this is more apropri
 ```php
 <?php
 $pdf = new WkHtmlToPdf(array(
+    'no-outline',         // Don't let Chrome complain ...
     'margin-top'    => 0,
     'margin-right'  => 0,
     'margin-bottom' => 0,
