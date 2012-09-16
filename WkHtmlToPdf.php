@@ -14,6 +14,7 @@
  *      $pdf = new WkHtmlToPdf;
  *      $pdf->addPage('http://google.com');
  *      $pdf->addPage('/home/joe/my.pdf');
+ *      $pdf->addPageFromString("<html>...</html>");
  *      $pdf->addCover('mycover.pdf');
  *      $pdf->addToc();
  *
@@ -65,7 +66,8 @@ class WkHtmlToPdf
     protected $objects=array();
 
     protected $tmp;
-    protected $tmpFile;
+    protected $tmpFile=null;
+    protected $tmpPages=array();
 
     protected $error;
 
@@ -85,6 +87,11 @@ class WkHtmlToPdf
     {
         if($this->tmpFile!==null)
             unlink($this->tmpFile);
+
+		// Delete tmp pages
+		if(!empty($this->tmpPages))
+			foreach($this->tmpPages as $pg)
+				unlink($pg);
     }
 
     /**
@@ -98,6 +105,28 @@ class WkHtmlToPdf
         $options['input']=$input;
         $this->objects[]=array_merge($this->pageOptions,$options);
     }
+
+	/**
+	 * Create a local file from an HTML string
+	 * and add it as a page object to the output
+	 *
+	 * @param string $html a string containing html
+	 * @param array $options optional options for this page
+	 */
+	public function addPageFromString($html,$options=array())
+	{
+		// Create temp file and rename to .html format
+		// wkhtmltopdf has trouble reading local files without a known extension
+		$tmpOutput = tempnam($this->getTempDir(),'tmp_WkHtmlToPdf_Page_');
+		$tmpPage   = $tmpOutput . '.html';
+		rename($tmpOutput, $tmpPage);
+		// Add reference so we can unlink later
+		$this->tmpPages[] = $tmpPage;
+		// Store contents in temp file
+		file_put_contents($tmpPage, $html);
+		// Add temp page to PDF
+		$this->addPage($tmpPage, $options);
+	}
 
     /**
      * Add a cover page object to the output
@@ -114,7 +143,6 @@ class WkHtmlToPdf
     /**
      * Add a TOC object to the output
      *
-     * @param string $input either a URL or a PDF filename
      * @param array $options optional options for this page
      */
     public function addToc($options=array())
@@ -197,6 +225,16 @@ class WkHtmlToPdf
         return $this->error;
     }
 
+	/**
+	 * @return the temp working directory
+	 */
+	public function getTempDir()
+	{
+		if($this->tmp===null)
+			$this->tmp=sys_get_temp_dir();
+		return $this->tmp;
+	}
+
     /**
      * @return mixed the temporary PDF filename or false on error (triggers PDf creation)
      */
@@ -204,10 +242,7 @@ class WkHtmlToPdf
     {
         if($this->tmpFile===null)
         {
-            if($this->tmp===null)
-                $this->tmp=sys_get_temp_dir();
-
-            $tmpFile=tempnam($this->tmp,'tmp_WkHtmlToPdf_');
+            $tmpFile=tempnam($this->getTempDir(),'tmp_WkHtmlToPdf_');
 
             if($this->createPdf($tmpFile)===true)
                 $this->tmpFile=$tmpFile;
