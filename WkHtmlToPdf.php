@@ -9,65 +9,84 @@
  * binary is preferred but this class should also work with the non static version,
  * even though a lot of features will be missing.
  *
- * Basic use:
+ * Basic use
+ * ---------
  *
  *      $pdf = new WkHtmlToPdf;
+ *
+ *      // Add a HTML file, a HTML string, a page from URL or a PDF file
+ *      $pdf->addPage('/home/joe/page.html');
+ *      $pdf->addPage('<html>....</html>');
  *      $pdf->addPage('http://google.com');
  *      $pdf->addPage('/home/joe/my.pdf');
+ *
+ *      // Add a cover (same sources as above are possible)
  *      $pdf->addCover('mycover.pdf');
+ *
+ *      // Add a Table of contents
  *      $pdf->addToc();
  *
- *      // Save the PDF
+ *      // Save the PDF, or ...
  *      $pdf->saveAs('/tmp/new.pdf');
  *
- *      // Send to client for inline display
+ *      // ... send to client for inline display or ...
  *      $pdf->send();
  *
- *      // Send to client as file download
+ *      // ... send to client as file download
  *      $pdf->send('test.pdf');
  *
- * Setting options:
+ *
+ * Setting options
+ * ---------------
+ *
+ * The wkhtmltopdf binary has some global options (e.g. to set the document's DPI) and options
+ * for each PDF page (e.g. to supply a custom CSS file). Please see "wkhtmltopdf -H" to get a
+ * list of all available options.
+ *
+ * In addition this class also supports global page options: You can set default page options
+ * that will be applied to every page you add. You can also override these defaults per page:
  *
  *      $pdf = new WkHtmlToPdf($options);   // Set global PDF options
  *      $pdf->setOptions($options);         // Set global PDF options (alternative)
- *      $pdf->setPageOptions($options);     // Set global default page options
- *      $pdf->addPage($page, $options);     // Set page options (overrides default page options)
+ *      $pdf->setPageOptions($options);     // Set default page options
+ *      $pdf->addPage($page, $options);     // Add page with options (overrides default page options)
  *
- * Example options:
  *
- *      // See "wkhtmltopdf -H" for all available options
- *      $options=array(
- *          'no-outline',
- *          'margin-top'    =>0,
- *          'margin-right'  =>0,
- *      );
+ * Special global options
+ * ----------------------
  *
- * Extra global options:
+ * You can use these special global options to set up some file paths:
  *
  *      bin: path to the wkhtmltopdf binary. Defaults to /usr/bin/wkhtmltopdf.
  *      tmp: path to tmp directory. Defaults to PHP temp dir.
  *
- * Error handling:
  *
- *      saveAs() and save() will return false on error. In this case the detailed error message
- *      from wkhtmltopdf can be obtained through getError().
+ * Error handling
+ * --------------
+ *
+ * saveAs() and save() will return false on error. In this case the detailed error message
+ * from wkhtmltopdf can be obtained through getError().
  *
  * @author Michael Härtl <haertl.mike@gmail.com> (sponsored by PeoplePerHour.com)
- * @version 1.0.0
+ * @version 1.1.0
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
 {
-    protected $bin='/usr/bin/wkhtmltopdf';
+    protected $bin = '/usr/bin/wkhtmltopdf';
 
-    protected $options=array();
-    protected $pageOptions=array();
-    protected $objects=array();
+    protected $options = array();
+    protected $pageOptions = array();
+    protected $objects = array();
 
     protected $tmp;
     protected $tmpFile;
+    protected $tmpFiles = array();
 
     protected $error;
+
+    // Regular expression to detect HTML strings
+    const REGEX_HTML = '/<html>/i';
 
     /**
      * @param array $options global options for wkhtmltopdf (optional)
@@ -79,24 +98,27 @@ class WkHtmlToPdf
     }
 
     /**
-     * Remove temporary PDF file when script completes
+     * Remove temporary PDF file and pages when script completes
      */
     public function __destruct()
     {
         if($this->tmpFile!==null)
             unlink($this->tmpFile);
+
+        foreach($this->tmpFiles as $tmp)
+            unlink($tmp);
     }
 
     /**
      * Add a page object to the output
      *
-     * @param string $input either a URL or a PDF filename
+     * @param string $input either a URL, a HTML string or a PDF/HTML filename
      * @param array $options optional options for this page
      */
     public function addPage($input,$options=array())
     {
-        $options['input']=$input;
-        $this->objects[]=array_merge($this->pageOptions,$options);
+        $options['input'] = preg_match(self::REGEX_HTML, $input) ? $this->createTmpFile($input) : $input;
+        $this->objects[] = array_merge($this->pageOptions,$options);
     }
 
     /**
@@ -107,20 +129,19 @@ class WkHtmlToPdf
      */
     public function addCover($input,$options=array())
     {
-        $options['input']="cover $input";
-        $this->objects[]=array_merge($this->pageOptions,$options);
+        $options['input'] = "cover $input";
+        $this->objects[] = array_merge($this->pageOptions,$options);
     }
 
     /**
      * Add a TOC object to the output
      *
-     * @param string $input either a URL or a PDF filename
-     * @param array $options optional options for this page
+     * @param array $options optional options for the table of contents
      */
     public function addToc($options=array())
     {
-        $options['input']="toc";
-        $this->objects[]=$options;
+        $options['input'] = "toc";
+        $this->objects[] = $options;
     }
 
     /**
@@ -131,7 +152,7 @@ class WkHtmlToPdf
      */
     public function saveAs($filename)
     {
-        if(($pdfFile=$this->getPdfFilename())===false)
+        if(($pdfFile = $this->getPdfFilename())===false)
             return false;
 
         copy($pdfFile,$filename);
@@ -146,7 +167,7 @@ class WkHtmlToPdf
      */
     public function send($filename=null)
     {
-        if(($pdfFile=$this->getPdfFilename())===false)
+        if(($pdfFile = $this->getPdfFilename())===false)
             return false;
 
         header('Pragma: public');
@@ -172,13 +193,13 @@ class WkHtmlToPdf
     {
         foreach($options as $key=>$val)
             if($key==='bin')
-                $this->bin=$val;
+                $this->bin = $val;
             elseif($key==='tmp')
-                $this->tmp=$val;
+                $this->tmp = $val;
             elseif(is_int($key))
-                $this->options[]=$val;
+                $this->options[] = $val;
             else
-                $this->options[$key]=$val;
+                $this->options[$key] = $val;
     }
 
     /**
@@ -186,7 +207,7 @@ class WkHtmlToPdf
      */
     public function setPageOptions($options=array())
     {
-        $this->pageOptions=$options;
+        $this->pageOptions = $options;
     }
 
     /**
@@ -198,19 +219,27 @@ class WkHtmlToPdf
     }
 
     /**
+     * @return string path to temp directory
+     */
+    public function getTmpDir()
+    {
+        if($this->tmp===null)
+            $this->tmp = sys_get_temp_dir();
+
+        return $this->tmp;
+    }
+
+    /**
      * @return mixed the temporary PDF filename or false on error (triggers PDf creation)
      */
     protected function getPdfFilename()
     {
         if($this->tmpFile===null)
         {
-            if($this->tmp===null)
-                $this->tmp=sys_get_temp_dir();
-
-            $tmpFile=tempnam($this->tmp,'tmp_WkHtmlToPdf_');
+            $tmpFile = tempnam($this->getTmpDir(),'tmp_WkHtmlToPdf_');
 
             if($this->createPdf($tmpFile)===true)
-                $this->tmpFile=$tmpFile;
+                $this->tmpFile = $tmpFile;
             else
                 return false;
         }
@@ -224,15 +253,15 @@ class WkHtmlToPdf
      */
     protected function getCommand($filename)
     {
-        $command=$this->bin;
+        $command = $this->bin;
 
-        $command.=$this->renderOptions($this->options);
+        $command .= $this->renderOptions($this->options);
 
         foreach($this->objects as $object)
         {
-            $command.=' '.$object['input'];
+            $command .= ' '.$object['input'];
             unset($object['input']);
-            $command.=$this->renderOptions($object);
+            $command .= $this->renderOptions($object);
         }
 
         return $command.' '.$filename;
@@ -243,30 +272,47 @@ class WkHtmlToPdf
      */
     protected function createPdf($fileName)
     {
-        $command=$this->getCommand($fileName);
+        $command = $this->getCommand($fileName);
 
         // we use proc_open with pipes to fetch error output
-        $descriptors=array(
-            1=>array('pipe','w'),
-            2=>array('pipe','w'),
+        $descriptors = array(
+            1   => array('pipe','w'),
+            2   => array('pipe','w'),
         );
-        $process=proc_open($command, $descriptors, $pipes);
+        $process = proc_open($command, $descriptors, $pipes);
 
         if(is_resource($process)) {
 
-            $stdout=stream_get_contents($pipes[1]);
-            $stderr=stream_get_contents($pipes[2]);
+            $stdout = stream_get_contents($pipes[1]);
+            $stderr = stream_get_contents($pipes[2]);
             fclose($pipes[1]);
             fclose($pipes[2]);
 
-            $result=proc_close($process);
+            $result = proc_close($process);
 
             if($result!==0)
-                $this->error="Could not run command $command:\n$stderr";
+                $this->error = "Could not run command $command:\n$stderr";
         } else
-            $this->error="Could not run command $command";
+            $this->error = "Could not run command $command";
 
         return $this->error===null;
+    }
+
+    /**
+     * Create a tmp file with given content
+     *
+     * @param string $content the file content
+     * @return string the path to the created file
+     */
+    protected function createTmpFile($content)
+    {
+        $tmpFile = tempnam($this->getTmpDir(),'tmp_WkHtmlToPdf_');
+        rename($tmpFile, ($tmpFile.='.html'));
+        file_put_contents($tmpFile, $content);
+
+        $this->tmpFiles[] = $tmpFile;
+
+        return $tmpFile;
     }
 
     /**
@@ -275,12 +321,12 @@ class WkHtmlToPdf
      */
     protected function renderOptions($options)
     {
-        $out='';
+        $out = '';
         foreach($options as $key=>$val)
             if(is_numeric($key))
-                $out.=" --$val";
+                $out .= " --$val";
             else
-                $out.=" --$key $val";
+                $out .= " --$key $val";
 
         return $out;
     }
