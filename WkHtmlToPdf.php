@@ -68,7 +68,7 @@
  * from wkhtmltopdf can be obtained through getError().
  *
  * @author Michael Härtl <haertl.mike@gmail.com> (sponsored by PeoplePerHour.com)
- * @version 1.1.0
+ * @version 1.1.1-dev
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
@@ -86,7 +86,7 @@ class WkHtmlToPdf
     protected $error;
 
     // Regular expression to detect HTML strings
-    const REGEX_HTML = '/<html>/i';
+    const REGEX_HTML = '/<html/i';
 
     /**
      * @param array $options global options for wkhtmltopdf (optional)
