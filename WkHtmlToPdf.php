@@ -55,10 +55,9 @@
  * Special global options
  * ----------------------
  *
- * You can use these special global options to set up some file paths:
- *
- *      bin: path to the wkhtmltopdf binary. Defaults to /usr/bin/wkhtmltopdf.
- *      tmp: path to tmp directory. Defaults to PHP temp dir.
+ *  * bin:              Path to the wkhtmltopdf binary. Defaults to /usr/bin/wkhtmltopdf.
+ *  * tmp:              Path to tmp directory. Defaults to PHP temp dir.
+ *  * enableEscaping:   Wether arguments to wkhtmltopdf should be escaped. Default is true.
  *
  *
  * Error handling
@@ -67,13 +66,24 @@
  * saveAs() and save() will return false on error. In this case the detailed error message
  * from wkhtmltopdf can be obtained through getError().
  *
+ *
+ * Note for Windows users
+ * ----------------------
+ *
+ * If you use double quotes (") or percent signs (%) as option values, they may get
+ * converted to spaces. You can set `enableEscaping` to false in this case. But then
+ * you have to take care of proper escaping yourself. In some cases it may be
+ * neccessary to surround your argument values with extra double quotes.
+ *
  * @author Michael Härtl <haertl.mike@gmail.com> (sponsored by PeoplePerHour.com)
- * @version 1.1.1-dev
+ * @version 1.1.1
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
 {
     protected $bin = '/usr/bin/wkhtmltopdf';
+
+    protected $enableEscaping = true;
 
     protected $options = array();
     protected $pageOptions = array();
@@ -196,6 +206,8 @@ class WkHtmlToPdf
                 $this->bin = $val;
             elseif($key==='tmp')
                 $this->tmp = $val;
+            elseif($key==='enableEscaping')
+                $this->enableEscaping = (bool)$val;
             elseif(is_int($key))
                 $this->options[] = $val;
             else
@@ -253,7 +265,7 @@ class WkHtmlToPdf
      */
     protected function getCommand($filename)
     {
-        $command = $this->bin;
+        $command = $this->enableEscaping ? escapeshellarg($this->bin) : $this->bin;
 
         $command .= $this->renderOptions($this->options);
 
@@ -279,7 +291,7 @@ class WkHtmlToPdf
             1   => array('pipe','w'),
             2   => array('pipe','w'),
         );
-        $process = proc_open($command, $descriptors, $pipes);
+        $process = proc_open($command, $descriptors, $pipes, null, null, array('bypass_cmd'=>true));
 
         if(is_resource($process)) {
 
@@ -326,7 +338,7 @@ class WkHtmlToPdf
             if(is_numeric($key))
                 $out .= " --$val";
             else
-                $out .= " --$key $val";
+                $out .= " --$key ".($this->enableEscaping ? escapeshellarg($val) : $val);
 
         return $out;
     }
