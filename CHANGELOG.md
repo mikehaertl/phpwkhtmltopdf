@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.1.2
+
+ * Isue #4: Fix issue with longer PDFs
 
 ## 1.1.1
 

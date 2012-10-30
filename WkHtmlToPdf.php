@@ -76,7 +76,7 @@
  * neccessary to surround your argument values with extra double quotes.
  *
  * @author Michael Härtl <haertl.mike@gmail.com> (sponsored by PeoplePerHour.com)
- * @version 1.1.1
+ * @version 1.1.2
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
@@ -288,16 +288,13 @@ class WkHtmlToPdf
 
         // we use proc_open with pipes to fetch error output
         $descriptors = array(
-            1   => array('pipe','w'),
             2   => array('pipe','w'),
         );
         $process = proc_open($command, $descriptors, $pipes, null, null, array('bypass_cmd'=>true));
 
         if(is_resource($process)) {
 
-            $stdout = stream_get_contents($pipes[1]);
             $stderr = stream_get_contents($pipes[2]);
-            fclose($pipes[1]);
             fclose($pipes[2]);
 
             $result = proc_close($process);
