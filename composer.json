@@ -8,10 +8,10 @@
     "authors": [
         {
             "name": "Michael Haertl",
-            "email": "haertl.mike@gmail.com",
+            "email": "haertl.mike@gmail.com"
         }
     ],
     "require": {
-        "php": ">=5.0.0",
+        "php": ">=5.0.0"
     }
 }
