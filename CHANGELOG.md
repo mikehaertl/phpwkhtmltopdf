@@ -1,8 +1,14 @@
 # CHANGELOG
 
+## 1.1.3
+
+ * Made getCommand() public to ease debugging
+ * Issue #6: Fix typo that prevented shell escaping on windows
+ * Issue #5: Updated docs: wkhtmltopdf can not process PDF files
+
 ## 1.1.2
 
- * Isue #4: Fix issue with longer PDFs
+ * Issue #4: Fix issue with longer PDFs
 
 ## 1.1.1
 

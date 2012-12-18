@@ -14,34 +14,35 @@
  *
  *      $pdf = new WkHtmlToPdf;
  *
- *      // Add a HTML file, a HTML string, a page from URL or a PDF file
+ *      // Add a HTML file, a HTML string or a page from URL
  *      $pdf->addPage('/home/joe/page.html');
  *      $pdf->addPage('<html>....</html>');
  *      $pdf->addPage('http://google.com');
- *      $pdf->addPage('/home/joe/my.pdf');
  *
  *      // Add a cover (same sources as above are possible)
- *      $pdf->addCover('mycover.pdf');
+ *      $pdf->addCover('mycover.html');
  *
  *      // Add a Table of contents
  *      $pdf->addToc();
  *
- *      // Save the PDF, or ...
+ *      // Save the PDF
  *      $pdf->saveAs('/tmp/new.pdf');
  *
- *      // ... send to client for inline display or ...
+ *      // ... or send to client for inline display
  *      $pdf->send();
  *
- *      // ... send to client as file download
+ *      // ... or send to client as file download
  *      $pdf->send('test.pdf');
  *
  *
  * Setting options
  * ---------------
  *
- * The wkhtmltopdf binary has some global options (e.g. to set the document's DPI) and options
- * for each PDF page (e.g. to supply a custom CSS file). Please see "wkhtmltopdf -H" to get a
- * list of all available options.
+ * The wkhtmltopdf binary knows different types of options (please see wkhtmltopdf -H):
+ *
+ *      * global options (e.g. to set the document's DPI)
+ *      * page options (e.g. to supply a custom CSS file for a page)
+ *      * toc options (e.g. to set a TOC header)
  *
  * In addition this class also supports global page options: You can set default page options
  * that will be applied to every page you add. You can also override these defaults per page:
@@ -50,6 +51,7 @@
  *      $pdf->setOptions($options);         // Set global PDF options (alternative)
  *      $pdf->setPageOptions($options);     // Set default page options
  *      $pdf->addPage($page, $options);     // Add page with options (overrides default page options)
+ *      $pdf->addToc($options);             // Add TOC with options
  *
  *
  * Special global options
@@ -63,20 +65,24 @@
  * Error handling
  * --------------
  *
- * saveAs() and save() will return false on error. In this case the detailed error message
- * from wkhtmltopdf can be obtained through getError().
+ * saveAs() and send() will return false on error. In this case the detailed error message
+ * from wkhtmltopdf can be obtained through getError():
+ *
+ *      if(!$pdf->send())
+ *          throw new Exception('Could not create PDF: '.$pdf->getError());
  *
  *
  * Note for Windows users
  * ----------------------
  *
  * If you use double quotes (") or percent signs (%) as option values, they may get
- * converted to spaces. You can set `enableEscaping` to false in this case. But then
- * you have to take care of proper escaping yourself. In some cases it may be
+ * converted to spaces. You can set `enableEscaping` to `false` in this case. But
+ * then you have to take care of proper escaping yourself. In some cases it may be
  * neccessary to surround your argument values with extra double quotes.
  *
+ *
  * @author Michael Härtl <haertl.mike@gmail.com> (sponsored by PeoplePerHour.com)
- * @version 1.1.2
+ * @version 1.1.3
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
@@ -242,6 +248,26 @@ class WkHtmlToPdf
     }
 
     /**
+     * @param string $filename the filename of the output file
+     * @return string the wkhtmltopdf command string
+     */
+    public function getCommand($filename)
+    {
+        $command = $this->enableEscaping ? escapeshellarg($this->bin) : $this->bin;
+
+        $command .= $this->renderOptions($this->options);
+
+        foreach($this->objects as $object)
+        {
+            $command .= ' '.$object['input'];
+            unset($object['input']);
+            $command .= $this->renderOptions($object);
+        }
+
+        return $command.' '.$filename;
+    }
+
+    /**
      * @return mixed the temporary PDF filename or false on error (triggers PDf creation)
      */
     protected function getPdfFilename()
@@ -260,26 +286,6 @@ class WkHtmlToPdf
     }
 
     /**
-     * @param string $filename the filename of the output file
-     * @return string the wkhtmltopdf command string
-     */
-    protected function getCommand($filename)
-    {
-        $command = $this->enableEscaping ? escapeshellarg($this->bin) : $this->bin;
-
-        $command .= $this->renderOptions($this->options);
-
-        foreach($this->objects as $object)
-        {
-            $command .= ' '.$object['input'];
-            unset($object['input']);
-            $command .= $this->renderOptions($object);
-        }
-
-        return $command.' '.$filename;
-    }
-
-    /**
      * Create the temporary PDF file
      */
     protected function createPdf($fileName)
@@ -290,7 +296,7 @@ class WkHtmlToPdf
         $descriptors = array(
             2   => array('pipe','w'),
         );
-        $process = proc_open($command, $descriptors, $pipes, null, null, array('bypass_cmd'=>true));
+        $process = proc_open($command, $descriptors, $pipes, null, null, array('bypass_shell'=>true));
 
         if(is_resource($process)) {
 
