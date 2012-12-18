@@ -51,6 +51,7 @@
  *      $pdf->setOptions($options);         // Set global PDF options (alternative)
  *      $pdf->setPageOptions($options);     // Set default page options
  *      $pdf->addPage($page, $options);     // Add page with options (overrides default page options)
+ *      $pdf->addCover($page, $options);    // Add cover with options (overrides default page options)
  *      $pdf->addToc($options);             // Add TOC with options
  *
  *
@@ -82,7 +83,7 @@
  *
  *
  * @author Michael Härtl <haertl.mike@gmail.com> (sponsored by PeoplePerHour.com)
- * @version 1.1.3
+ * @version 1.1.4
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
