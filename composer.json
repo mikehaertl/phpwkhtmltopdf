@@ -1,0 +1,17 @@
+{
+    "name": "mikehaertl/phpwkhtmltopdf",
+    "description": "A slim PHP wrapper around wkhtmltopdf with an easy to use and clean OOP interface",
+    "keywords": ["pdf"],
+    "homepage": "http://mikehaertl.github.com/phpwkhtmltopdf/",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michael Haertl",
+            "email": "haertl.mike@gmail.com",
+        }
+    ],
+    "require": {
+        "php": ">=5.0.0",
+    }
+}
