@@ -83,7 +83,7 @@
  *
  *
  * @author Michael Härtl <haertl.mike@gmail.com> (sponsored by PeoplePerHour.com)
- * @version 1.1.4
+ * @version 1.1.5-dev
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
@@ -307,7 +307,12 @@ class WkHtmlToPdf
             $result = proc_close($process);
 
             if($result!==0)
-                $this->error = "Could not run command $command:\n$stderr";
+            {
+                if (!file_exists($fileName) || filesize($fileName)===0)
+                    $this->error = "Could not run command $command:\n$stderr";
+                else
+                    $this->error = "Warning: an error occured while creating the PDF.\n$stderr";
+            }
         } else
             $this->error = "Could not run command $command";
 

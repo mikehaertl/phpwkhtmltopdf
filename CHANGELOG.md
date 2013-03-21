@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.1.5
+
+ * Issue #10: Improve error reporting
+
+## 1.1.4
+
+ * Add composer.jsone
+
 ## 1.1.3
 
  * Made getCommand() public to ease debugging
