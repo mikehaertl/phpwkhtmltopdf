@@ -14,6 +14,9 @@
     "require": {
         "php": ">=5.0.0"
     },
+    "autoload": {
+        "classmap": ["WkHtmlToPdf.php"]
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "1.1.x-dev"
