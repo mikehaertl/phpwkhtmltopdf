@@ -83,7 +83,7 @@
  *
  *
  * @author Michael Härtl <haertl.mike@gmail.com> (sponsored by PeoplePerHour.com)
- * @version 1.1.5-dev
+ * @version 1.1.5
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf

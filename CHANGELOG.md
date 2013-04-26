@@ -2,6 +2,7 @@
 
 ## 1.1.5
 
+ * Add composer autoloading (thanks igorw)
  * Issue #10: Improve error reporting
 
 ## 1.1.4
