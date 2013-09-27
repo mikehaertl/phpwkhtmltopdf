@@ -60,7 +60,8 @@
  *
  *  * bin:              Path to the wkhtmltopdf binary. Defaults to /usr/bin/wkhtmltopdf.
  *  * tmp:              Path to tmp directory. Defaults to PHP temp dir.
- *  * enableEscaping:   Wether arguments to wkhtmltopdf should be escaped. Default is true.
+ *  * enableEscaping:   Whether arguments to wkhtmltopdf should be escaped. Default is true.
+ *  * version9:         Whether to use command line syntax for wkhtmltopdf < 0.10 
  *
  *
  * Error handling
@@ -83,7 +84,7 @@
  *
  *
  * @author Michael Härtl <haertl.mike@gmail.com> (sponsored by PeoplePerHour.com)
- * @version 1.1.5
+ * @version 1.1.6
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
@@ -91,6 +92,7 @@ class WkHtmlToPdf
     protected $bin = '/usr/bin/wkhtmltopdf';
 
     protected $enableEscaping = true;
+    protected $version9 = false;
 
     protected $options = array();
     protected $pageOptions = array();
@@ -146,7 +148,7 @@ class WkHtmlToPdf
      */
     public function addCover($input,$options=array())
     {
-        $options['input'] = "cover $input";
+        $options['input'] = ($this->version9 ? '--' : '')."cover $input";
         $this->objects[] = array_merge($this->pageOptions,$options);
     }
 
@@ -157,7 +159,7 @@ class WkHtmlToPdf
      */
     public function addToc($options=array())
     {
-        $options['input'] = "toc";
+        $options['input'] = ($this->version9 ? '--' : '')."toc";
         $this->objects[] = $options;
     }
 
@@ -165,7 +167,7 @@ class WkHtmlToPdf
      * Save the PDF to given filename (triggers PDF creation)
      *
      * @param string $filename to save PDF as
-     * @return bool wether PDF was created successfully
+     * @return bool whether PDF was created successfully
      */
     public function saveAs($filename)
     {
@@ -180,7 +182,7 @@ class WkHtmlToPdf
      * Send PDF to client, either inline or as download (triggers PDF creation)
      *
      * @param mixed $filename the filename to send. If empty, the PDF is streamed.
-     * @return bool wether PDF was created successfully
+     * @return bool whether PDF was created successfully
      */
     public function send($filename=null)
     {
@@ -215,6 +217,8 @@ class WkHtmlToPdf
                 $this->tmp = $val;
             elseif($key==='enableEscaping')
                 $this->enableEscaping = (bool)$val;
+            elseif($key==='version9')
+                $this->version9 = (bool)$val;
             elseif(is_int($key))
                 $this->options[] = $val;
             else
