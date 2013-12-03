@@ -89,6 +89,7 @@
  */
 class WkHtmlToPdf
 {
+    protected $so = null;
     protected $bin = '/usr/bin/wkhtmltopdf';
     protected $procArgs = null;
 
@@ -114,6 +115,8 @@ class WkHtmlToPdf
      */
     public function __construct ($options = array())
     {
+        $this->so = (DIRECTORY_SEPARATOR === '/') ? 'unix' : 'win';
+
         if ($options !== array()) {
             $this->setOptions($options);
         }
@@ -135,11 +138,15 @@ class WkHtmlToPdf
 
     public function setXvfb ($enable = true)
     {
-        $this->xvfb = $enable;
+        if (($enable === true) && ($this->so === 'unix')) {
+            $xvfb = shell_exec('which xvfb-run');
+        } else if (is_string($enable)) {
+            $xvfb = $enable;
+        } else {
+            $xvfb = '';
+        }
 
-        $xvfb = shell_exec('which xvfb-run');
-
-        if (($enable === true) && empty($xvfb)) {
+        if ($enable && empty($xvfb)) {
             return $this->setXvfb(false);
         }
 
@@ -151,7 +158,7 @@ class WkHtmlToPdf
             unset($this->options[$key]);
         }
  
-        if ($enable === true) {
+        if ($enable) {
             $this->bin = $command.$this->bin;
             $this->options[] = 'use-xserver';
         } else {
