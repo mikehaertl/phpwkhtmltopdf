@@ -23,6 +23,7 @@ $pdf = new \WkHtmlToPdf([
 ```php
 # NEW: Auto detect executable location (only unix/linux)
 $pdf = new \WkHtmlToPdf();
+```
 
 #### Set xvfb
 
