@@ -90,7 +90,7 @@
 class WkHtmlToPdf
 {
     protected $unix = null;
-    protected $bin = '/usr/bin/wkhtmltopdf';
+    protected $bin = 'wkhtmltopdf';
     protected $procEnv = null;
 
     protected $enableEscaping = true;
@@ -117,8 +117,12 @@ class WkHtmlToPdf
     {
         $this->unix = (DIRECTORY_SEPARATOR === '/') ? true : false;
 
-        if ($options !== array()) {
+        if (is_array($options)) {
             $this->setOptions($options);
+        }
+
+        if (empty($options['bin'])) {
+            $this->bin = $this->binLocation($this->bin);
         }
     }
 
@@ -276,11 +280,11 @@ class WkHtmlToPdf
 
     private function binLocation ($bin)
     {
-        if ($this->unix || strstr($bin, '/')) {
+        if (($this->unix === false) || strstr($bin, '/')) {
             return $bin;
         }
 
-        $path = preg_replace('#/+#', '/', shell_exec('which "'.$bin.'"').'/').$bin;
+        return preg_replace('#/+#', '/', shell_exec('which "'.$bin.'"').'/').$bin;
     }
 
     /**
