@@ -89,7 +89,7 @@
  */
 class WkHtmlToPdf
 {
-    protected $so = null;
+    protected $unix = null;
     protected $bin = '/usr/bin/wkhtmltopdf';
     protected $procArgs = null;
 
@@ -115,7 +115,7 @@ class WkHtmlToPdf
      */
     public function __construct ($options = array())
     {
-        $this->so = (DIRECTORY_SEPARATOR === '/') ? 'unix' : 'win';
+        $this->unix = (DIRECTORY_SEPARATOR === '/') ? true : false;
 
         if ($options !== array()) {
             $this->setOptions($options);
@@ -138,7 +138,7 @@ class WkHtmlToPdf
 
     public function setXvfb ($enable = true)
     {
-        if (($enable === true) && ($this->so === 'unix')) {
+        if (($enable === true) && $this->unix) {
             $xvfb = shell_exec('which xvfb-run');
         } else if (is_string($enable)) {
             $xvfb = $enable;
@@ -274,8 +274,9 @@ class WkHtmlToPdf
         }
     }
 
-    private function binLocation ($bin) {
-        if ((DIRECTORY_SEPARATOR !== '/') || strstr($bin, '/')) {
+    private function binLocation ($bin)
+    {
+        if ($this->unix || strstr($bin, '/')) {
             return $bin;
         }
 
@@ -339,7 +340,7 @@ class WkHtmlToPdf
             return $this->tmpFile;
         }
 
-        $tmpFile = tempnam($this->getTmpDir(),'tmp_WkHtmlToPdf_');
+        $tmpFile = tempnam($this->getTmpDir(), 'tmp_WkHtmlToPdf_');
 
         if ($this->createPdf($tmpFile) === true) {
             return $this->tmpFile = $tmpFile;
@@ -410,7 +411,7 @@ class WkHtmlToPdf
         $out = '';
 
         foreach ($options as $key => $val) {
-            if(is_numeric($key)) {
+            if (is_numeric($key)) {
                 $out .= " --$val";
             } else {
                 $out .= " --$key ".($this->enableEscaping ? escapeshellarg($val) : $val);
