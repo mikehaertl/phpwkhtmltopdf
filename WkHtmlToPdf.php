@@ -138,6 +138,11 @@ class WkHtmlToPdf
         $this->xvfb = $enable;
 
         $xvfb = shell_exec('which xvfb-run');
+
+        if (($enable === true) && empty($xvfb)) {
+            return $this->setXvfb(false);
+        }
+
         $command = $xvfb.' --server-args="-screen 0, 1024x780x24" ';
 
         $key = array_search('use-xserver', $this->options, true);
@@ -152,6 +157,8 @@ class WkHtmlToPdf
         } else {
             $this->bin = str_replace($command, '', $this->bin);
         }
+
+        return $enable;
     }
 
     /**
