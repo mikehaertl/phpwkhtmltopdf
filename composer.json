@@ -1,5 +1,5 @@
 {
-    "name": "mikehaertl/phpwkhtmltopdf",
+    "name": "eusonlito/phpwkhtmltopdf",
     "description": "A slim PHP wrapper around wkhtmltopdf with an easy to use and clean OOP interface",
     "keywords": ["pdf"],
     "homepage": "http://mikehaertl.github.com/phpwkhtmltopdf/",
