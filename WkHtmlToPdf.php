@@ -243,7 +243,7 @@ class WkHtmlToPdf
     {
         foreach ($options as $key => $val) {
             if ($key === 'bin') {
-                $this->bin = $val;
+                $this->bin = $this->binLocation($val);
             } elseif ($key === 'tmp') {
                 $this->tmp = $val;
             } elseif ($key==='procArgs') {
@@ -258,6 +258,14 @@ class WkHtmlToPdf
                 $this->options[$key] = $val;
             }
         }
+    }
+
+    private function binLocation ($bin) {
+        if ((DIRECTORY_SEPARATOR !== '/') || strstr($bin, '/')) {
+            return $bin;
+        }
+
+        $path = preg_replace('#/+#', '/', shell_exec('which "'.$bin.'"').'/').$bin;
     }
 
     /**
