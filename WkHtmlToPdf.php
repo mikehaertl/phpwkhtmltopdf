@@ -143,7 +143,7 @@ class WkHtmlToPdf
     public function setXvfb ($enable = true)
     {
         if (($enable === true) && $this->unix) {
-            $xvfb = shell_exec('which xvfb-run');
+            $xvfb = trim(shell_exec('which xvfb-run'));
         } else if (is_string($enable)) {
             $xvfb = $enable;
         } else {
@@ -165,8 +165,10 @@ class WkHtmlToPdf
         if ($enable) {
             $this->bin = $command.$this->bin;
             $this->options[] = 'use-xserver';
+            $this->enableEscaping = false;
         } else {
             $this->bin = str_replace($command, '', $this->bin);
+            $this->enableEscaping = true;
         }
 
         return $enable;
@@ -284,7 +286,7 @@ class WkHtmlToPdf
             return $bin;
         }
 
-        return preg_replace('#/+#', '/', shell_exec('which "'.$bin.'"').'/').$bin;
+        return preg_replace('#/+#', '/', trim(shell_exec('which "'.$bin.'"')).'/').$bin;
     }
 
     /**
@@ -346,11 +348,9 @@ class WkHtmlToPdf
 
         $tmpFile = tempnam($this->getTmpDir(), 'tmp_WkHtmlToPdf_');
 
-        if ($this->createPdf($tmpFile) === true) {
-            return $this->tmpFile = $tmpFile;
-        } else {
-            return false;
-        }
+        $this->createPdf($tmpFile);
+
+        return is_file($tmpFile) ? ($this->tmpFile = $tmpFile) : false;
     }
 
     /**
