@@ -95,6 +95,7 @@ class WkHtmlToPdf
 
     protected $enableEscaping = true;
     protected $version9 = false;
+    protected $xvfb = false;
 
     protected $options = array();
     protected $pageOptions = array();
@@ -137,6 +138,45 @@ class WkHtmlToPdf
         foreach ($this->tmpFiles as $tmp) {
             unlink($tmp);
         }
+    }
+
+    /**
+     * Enable/disable xvfb sever on non GUI enviroments
+     *
+     * @param string/boolean $enable allow to enable/disable xvfb execution or accept xvfb string as server bin path
+     */
+    public function setXvfb($enable = true)
+    {
+        if (($enable === true) && $this->unix) {
+            $xvfb = trim(shell_exec('which xvfb-run'));
+        } else if (is_string($enable)) {
+            $xvfb = $enable;
+        } else {
+            $xvfb = '';
+        }
+
+        if ($enable && empty($xvfb)) {
+            return $this->setXvfb(false);
+        }
+
+        $command = $xvfb.' --server-args="-screen 0, 1024x780x24" ';
+
+        $key = array_search('use-xserver', $this->options, true);
+
+        if ($key !== false) {
+            unset($this->options[$key]);
+        }
+ 
+        if ($enable) {
+            $this->bin = $command.$this->bin;
+            $this->options[] = 'use-xserver';
+            $this->enableEscaping = false;
+        } else {
+            $this->bin = str_replace($command, '', $this->bin);
+            $this->enableEscaping = true;
+        }
+
+        return $enable;
     }
 
     /**

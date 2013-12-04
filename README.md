@@ -20,3 +20,30 @@ $pdf = new \WkHtmlToPdf([
     'bin' => 'wkhtmltopdf'
 ]);
 ```
+
+#### ADDED: Set xvfb
+
+
+```php
+# Set xvfb auto detect executable xvfb-run location (only unix/linux)
+$pdf->setXvfb(true);
+```
+
+```php
+# Set xvfb bin manually
+$pdf->setXvfb('/usr/bin/xvfb-run');
+```
+
+```php
+# Disable xvfb load
+$pdf->setXvfb(false);
+```
+
+#### ADDED: proc_open env arguments
+
+```php
+$pdf = new \WkHtmlToPdf([
+    'bin' => (BIN_PATH.'/wkhtmltopdf'),
+    'procEnv' => ['option1' => 'value1']
+]);
+```
