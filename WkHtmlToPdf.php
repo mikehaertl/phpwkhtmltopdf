@@ -91,6 +91,7 @@ class WkHtmlToPdf
 {
     protected $unix = null;
     protected $bin = 'wkhtmltopdf';
+    protected $procEnv = null;
 
     protected $enableEscaping = true;
     protected $version9 = false;
@@ -230,6 +231,8 @@ class WkHtmlToPdf
                 $this->bin = $this->binLocation($val);
             } elseif ($key === 'tmp') {
                 $this->tmp = $val;
+            } elseif ($key === 'procEnv') {
+                $this->procEnv = $val;
             } elseif ($key === 'enableEscaping') {
                 $this->enableEscaping = (bool)$val;
             } elseif ($key === 'version9') {
@@ -330,7 +333,7 @@ class WkHtmlToPdf
         // we use proc_open with pipes to fetch error output
         $descriptors = array(2 => array('pipe', 'w'));
 
-        $process = proc_open($command, $descriptors, $pipes, null, null, array('bypass_shell' => true));
+        $process = proc_open($command, $descriptors, $pipes, null, $this->procEnv, array('bypass_shell' => true));
 
         if (!is_resource($process)) {
             $this->error = "Could not run command $command";
