@@ -113,7 +113,7 @@ class WkHtmlToPdf
     /**
      * @param array $options global options for wkhtmltopdf (optional)
      */
-    public function __construct ($options = array())
+    public function __construct($options = array())
     {
         $this->unix = (DIRECTORY_SEPARATOR === '/') ? true : false;
 
@@ -129,7 +129,7 @@ class WkHtmlToPdf
     /**
      * Remove temporary PDF file and pages when script completes
      */
-    public function __destruct ()
+    public function __destruct()
     {
         if ($this->tmpFile !== null) {
             unlink($this->tmpFile);
@@ -140,7 +140,7 @@ class WkHtmlToPdf
         }
     }
 
-    public function setXvfb ($enable = true)
+    public function setXvfb($enable = true)
     {
         if (($enable === true) && $this->unix) {
             $xvfb = trim(shell_exec('which xvfb-run'));
@@ -180,7 +180,7 @@ class WkHtmlToPdf
      * @param string $input either a URL, a HTML string or a PDF/HTML filename
      * @param array $options optional options for this page
      */
-    public function addPage ($input, $options = array())
+    public function addPage($input, $options = array())
     {
         $options['input'] = preg_match(self::REGEX_HTML, $input) ? $this->createTmpFile($input) : $input;
         $this->objects[] = array_merge($this->pageOptions,$options);
@@ -192,7 +192,7 @@ class WkHtmlToPdf
      * @param string $input either a URL or a PDF filename
      * @param array $options optional options for this page
      */
-    public function addCover ($input, $options = array())
+    public function addCover($input, $options = array())
     {
         $options['input'] = ($this->version9 ? '--' : '').'cover '.$input;
         $this->objects[] = array_merge($this->pageOptions, $options);
@@ -203,7 +203,7 @@ class WkHtmlToPdf
      *
      * @param array $options optional options for the table of contents
      */
-    public function addToc ($options = array())
+    public function addToc($options = array())
     {
         $options['input'] = ($this->version9 ? '--' : '').'toc';
         $this->objects[] = $options;
@@ -215,7 +215,7 @@ class WkHtmlToPdf
      * @param string $filename to save PDF as
      * @return bool whether PDF was created successfully
      */
-    public function saveAs ($filename)
+    public function saveAs($filename)
     {
         if (($pdfFile = $this->getPdfFilename()) === false) {
             return false;
@@ -232,7 +232,7 @@ class WkHtmlToPdf
      * @param mixed $filename the filename to send. If empty, the PDF is streamed.
      * @return bool whether PDF was created successfully
      */
-    public function send ($filename = null)
+    public function send($filename = null)
     {
         if (($pdfFile = $this->getPdfFilename()) === false) {
             return false;
@@ -259,7 +259,7 @@ class WkHtmlToPdf
      *
      * @param array $options list of global options to set as name/value pairs
      */
-    public function setOptions ($options)
+    public function setOptions($options)
     {
         foreach ($options as $key => $val) {
             if ($key === 'bin') {
@@ -280,7 +280,7 @@ class WkHtmlToPdf
         }
     }
 
-    private function binLocation ($bin)
+    private function binLocation($bin)
     {
         if (($this->unix === false) || strstr($bin, '/')) {
             return $bin;
@@ -292,7 +292,7 @@ class WkHtmlToPdf
     /**
      * @param array $options that should be applied to all pages as name/value pairs
      */
-    public function setPageOptions ($options = array())
+    public function setPageOptions($options = array())
     {
         $this->pageOptions = $options;
     }
@@ -300,7 +300,7 @@ class WkHtmlToPdf
     /**
      * @return mixed the detailled error message including the wkhtmltopdf command or null if none
      */
-    public function getError ()
+    public function getError()
     {
         return $this->error;
     }
@@ -308,7 +308,7 @@ class WkHtmlToPdf
     /**
      * @return string path to temp directory
      */
-    public function getTmpDir ()
+    public function getTmpDir()
     {
         if ($this->tmp === null) {
             $this->tmp = sys_get_temp_dir();
@@ -321,7 +321,7 @@ class WkHtmlToPdf
      * @param string $filename the filename of the output file
      * @return string the wkhtmltopdf command string
      */
-    public function getCommand ($filename)
+    public function getCommand($filename)
     {
         $command = $this->enableEscaping ? escapeshellarg($this->bin) : $this->bin;
         $command .= $this->renderOptions($this->options);
@@ -340,7 +340,7 @@ class WkHtmlToPdf
     /**
      * @return mixed the temporary PDF filename or false on error (triggers PDf creation)
      */
-    protected function getPdfFilename ()
+    protected function getPdfFilename()
     {
         if ($this->tmpFile !== null) {
             return $this->tmpFile;
@@ -356,7 +356,7 @@ class WkHtmlToPdf
     /**
      * Create the temporary PDF file
      */
-    protected function createPdf ($fileName)
+    protected function createPdf($fileName)
     {
         $command = $this->getCommand($fileName);
 
@@ -395,7 +395,7 @@ class WkHtmlToPdf
      * @param string $content the file content
      * @return string the path to the created file
      */
-    protected function createTmpFile ($content)
+    protected function createTmpFile($content)
     {
         $tmpFile = tempnam($this->getTmpDir(),'tmp_WkHtmlToPdf_');
         rename($tmpFile, ($tmpFile .= '.html'));
@@ -410,7 +410,7 @@ class WkHtmlToPdf
      * @param array $options for a wkhtml, either global or for an object
      * @return string the string with options
      */
-    protected function renderOptions ($options)
+    protected function renderOptions($options)
     {
         $out = '';
 
