@@ -89,7 +89,8 @@
  */
 class WkHtmlToPdf
 {
-    protected $bin = '/usr/bin/wkhtmltopdf';
+    protected $unix = null;
+    protected $bin = 'wkhtmltopdf';
 
     protected $enableEscaping = true;
     protected $version9 = false;
@@ -112,8 +113,14 @@ class WkHtmlToPdf
      */
     public function __construct($options = array())
     {
+        $this->unix = (DIRECTORY_SEPARATOR === '/') ? true : false;
+
         if (is_array($options)) {
             $this->setOptions($options);
+        }
+
+        if (empty($options['bin'])) {
+            $this->bin = $this->binLocation($this->bin);
         }
     }
 
@@ -220,7 +227,7 @@ class WkHtmlToPdf
     {
         foreach ($options as $key => $val) {
             if ($key === 'bin') {
-                $this->bin = $val;
+                $this->bin = $this->binLocation($val);
             } elseif ($key === 'tmp') {
                 $this->tmp = $val;
             } elseif ($key === 'enableEscaping') {
@@ -233,6 +240,20 @@ class WkHtmlToPdf
                 $this->options[$key] = $val;
             }
         }
+    }
+
+    /**
+     * Detect wkhtmltopdf binary location
+     *
+     * @param string $bin with path or binary name
+     */
+    private function binLocation($bin)
+    {
+        if (($this->unix === false) || strstr($bin, '/')) {
+            return $bin;
+        }
+
+        return preg_replace('#/+#', '/', trim(shell_exec('which "'.$bin.'"')).'/').$bin;
     }
 
     /**
@@ -307,7 +328,7 @@ class WkHtmlToPdf
         $command = $this->getCommand($fileName);
 
         // we use proc_open with pipes to fetch error output
-        $descriptors = array(2 => array('pipe','w'));
+        $descriptors = array(2 => array('pipe', 'w'));
 
         $process = proc_open($command, $descriptors, $pipes, null, null, array('bypass_shell' => true));
 
