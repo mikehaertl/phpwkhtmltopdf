@@ -121,7 +121,7 @@ class WkHtmlToPdf
         }
 
         if (empty($options['bin'])) {
-            $this->bin = $this->binLocation($this->bin);
+            $this->setBin($this->bin);
         }
     }
 
@@ -267,7 +267,7 @@ class WkHtmlToPdf
     {
         foreach ($options as $key => $val) {
             if ($key === 'bin') {
-                $this->bin = $this->binLocation($val);
+                $this->setBin($val);
             } elseif ($key === 'tmp') {
                 $this->tmp = $val;
             } elseif ($key === 'procEnv') {
@@ -288,14 +288,19 @@ class WkHtmlToPdf
      * Detect wkhtmltopdf binary location
      *
      * @param string $bin with path or binary name
+     * @return string with wkhtmltopdf binary full path
      */
-    private function binLocation($bin)
+    private function setBin($bin)
     {
         if (($this->unix === false) || strstr($bin, '/')) {
-            return $bin;
+            $this->bin = $bin;
+        } elseif ($bin) {
+            $this->bin = trim(shell_exec('which "'.$bin.'"'));
+        } elseif ($this->bin) {
+            $this->bin = trim(shell_exec('which "'.$this->bin.'"'));
         }
 
-        return preg_replace('#/+#', '/', trim(shell_exec('which "'.$bin.'"')).'/').$bin;
+        return $this->bin;
     }
 
     /**
