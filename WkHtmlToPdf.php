@@ -294,10 +294,8 @@ class WkHtmlToPdf
     {
         if (($this->unix === false) || strstr($bin, '/')) {
             $this->bin = $bin;
-        } elseif ($bin) {
-            $this->bin = trim(shell_exec('which "'.$bin.'"'));
-        } elseif ($this->bin) {
-            $this->bin = trim(shell_exec('which "'.$this->bin.'"'));
+        } else {
+            $this->bin = trim(shell_exec('which "'.($bin ?: $this->bin).'"'));
         }
 
         return $this->bin;
