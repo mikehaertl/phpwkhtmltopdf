@@ -95,7 +95,6 @@ class WkHtmlToPdf
 
     protected $enableEscaping = true;
     protected $version9 = false;
-    protected $xvfb = false;
 
     protected $options = array();
     protected $pageOptions = array();
@@ -147,19 +146,19 @@ class WkHtmlToPdf
      */
     public function setXvfb($enable = true)
     {
+        $command = '';
+
         if (($enable === true) && $this->unix) {
-            $xvfb = trim(shell_exec('which xvfb-run'));
-        } else if (is_string($enable)) {
-            $xvfb = $enable;
-        } else {
-            $xvfb = '';
+            $command = trim(shell_exec('which xvfb-run'));
+        } elseif (is_string($enable)) {
+            $command = $enable;
         }
 
-        if ($enable && empty($xvfb)) {
+        if ($enable && empty($command)) {
             return $this->setXvfb(false);
         }
 
-        $command = $xvfb.' --server-args="-screen 0, 1024x780x24" ';
+        $command .= ' --server-args="-screen 0, 1024x780x24" ';
 
         $key = array_search('use-xserver', $this->options, true);
 
