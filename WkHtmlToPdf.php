@@ -143,8 +143,9 @@ class WkHtmlToPdf
      * Enable/disable xvfb sever on non GUI enviroments
      *
      * @param string/boolean $enable allow to enable/disable xvfb execution or accept xvfb string as server bin path
+     * @param string $args set xvfb-run "--server-args" parameters. Default value is "-screen 0, 1024x780x24"
      */
-    public function setXvfb($enable = true)
+    public function setXvfb($enable = true, $args = '-screen 0, 1024x780x24')
     {
         $command = '';
 
@@ -158,7 +159,7 @@ class WkHtmlToPdf
             return $this->setXvfb(false);
         }
 
-        $command .= ' --server-args="-screen 0, 1024x780x24" ';
+        $command .= ' --server-args="'.$args.'" ';
 
         $key = array_search('use-xserver', $this->options, true);
 
