@@ -70,8 +70,9 @@
  * saveAs() and send() will return false on error. In this case the detailed error message
  * from wkhtmltopdf can be obtained through getError():
  *
- *      if(!$pdf->send())
+ *      if (!$pdf->send()) {
  *          throw new Exception('Could not create PDF: '.$pdf->getError());
+ *      }
  *
  *
  * Note for Windows users
@@ -84,7 +85,7 @@
  *
  *
  * @author Michael Härtl <haertl.mike@gmail.com> (sponsored by PeoplePerHour.com)
- * @version 1.1.6
+ * @version 1.1.7-dev
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
@@ -112,8 +113,9 @@ class WkHtmlToPdf
      */
     public function __construct($options=array())
     {
-        if($options!==array())
+        if ($options!==array()) {
             $this->setOptions($options);
+        }
     }
 
     /**
@@ -121,11 +123,13 @@ class WkHtmlToPdf
      */
     public function __destruct()
     {
-        if($this->tmpFile!==null)
+        if ($this->tmpFile!==null) {
             unlink($this->tmpFile);
+        }
 
-        foreach($this->tmpFiles as $tmp)
+        foreach($this->tmpFiles as $tmp) {
             unlink($tmp);
+        }
     }
 
     /**
@@ -171,8 +175,9 @@ class WkHtmlToPdf
      */
     public function saveAs($filename)
     {
-        if(($pdfFile = $this->getPdfFilename())===false)
+        if (($pdfFile = $this->getPdfFilename())===false) {
             return false;
+        }
 
         copy($pdfFile,$filename);
         return true;
@@ -186,8 +191,9 @@ class WkHtmlToPdf
      */
     public function send($filename=null)
     {
-        if(($pdfFile = $this->getPdfFilename())===false)
+        if (($pdfFile = $this->getPdfFilename())===false) {
             return false;
+        }
 
         header('Pragma: public');
         header('Expires: 0');
@@ -196,8 +202,9 @@ class WkHtmlToPdf
         header('Content-Transfer-Encoding: binary');
         header('Content-Length: '.filesize($pdfFile));
 
-        if($filename!==null)
+        if ($filename!==null) {
             header("Content-Disposition: attachment; filename=\"$filename\"");
+        }
 
         readfile($pdfFile);
         return true;
@@ -210,19 +217,28 @@ class WkHtmlToPdf
      */
     public function setOptions($options)
     {
-        foreach($options as $key=>$val)
-            if($key==='bin')
-                $this->bin = $val;
-            elseif($key==='tmp')
-                $this->tmp = $val;
-            elseif($key==='enableEscaping')
-                $this->enableEscaping = (bool)$val;
-            elseif($key==='version9')
-                $this->version9 = (bool)$val;
-            elseif(is_int($key))
-                $this->options[] = $val;
-            else
-                $this->options[$key] = $val;
+        foreach ($options as $key=>$val) {
+            switch ($key) {
+                case 'bin':
+                    $this->bin = $val;
+                    break;
+                case 'tmp':
+                    $this->tmp = $val;
+                    break;
+                case 'enableEscaping':
+                    $this->enableEscaping = (bool)$val;
+                    break;
+                case 'version9':
+                    $this->version9 = (bool)$val;
+                    break;
+                default:
+                    if (is_int($key)) {
+                        $this->options[] = $val;
+                    } else {
+                        $this->options[$key] = $val;
+                    }
+            }
+        }
     }
 
     /**
@@ -246,8 +262,9 @@ class WkHtmlToPdf
      */
     public function getTmpDir()
     {
-        if($this->tmp===null)
+        if ($this->tmp===null) {
             $this->tmp = sys_get_temp_dir();
+        }
 
         return $this->tmp;
     }
@@ -277,14 +294,14 @@ class WkHtmlToPdf
      */
     protected function getPdfFilename()
     {
-        if($this->tmpFile===null)
-        {
+        if ($this->tmpFile===null) {
             $tmpFile = tempnam($this->getTmpDir(),'tmp_WkHtmlToPdf_');
 
-            if($this->createPdf($tmpFile)===true)
+            if ($this->createPdf($tmpFile)===true) {
                 $this->tmpFile = $tmpFile;
-            else
+            } else {
                 return false;
+            }
         }
 
         return $this->tmpFile;
@@ -303,22 +320,23 @@ class WkHtmlToPdf
         );
         $process = proc_open($command, $descriptors, $pipes, null, null, array('bypass_shell'=>true));
 
-        if(is_resource($process)) {
+        if (is_resource($process)) {
 
             $stderr = stream_get_contents($pipes[2]);
             fclose($pipes[2]);
 
             $result = proc_close($process);
 
-            if($result!==0)
-            {
-                if (!file_exists($fileName) || filesize($fileName)===0)
+            if ($result!==0) {
+                if (!file_exists($fileName) || filesize($fileName)===0) {
                     $this->error = "Could not run command $command:\n$stderr";
-                else
+                } else {
                     $this->error = "Warning: an error occured while creating the PDF.\n$stderr";
+                }
             }
-        } else
+        } else {
             $this->error = "Could not run command $command";
+        }
 
         return $this->error===null;
     }
@@ -348,10 +366,11 @@ class WkHtmlToPdf
     {
         $out = '';
         foreach($options as $key=>$val)
-            if(is_numeric($key))
+            if (is_numeric($key)) {
                 $out .= " --$val";
-            else
+            } else {
                 $out .= " --$key ".($this->enableEscaping ? escapeshellarg($val) : $val);
+            }
 
         return $out;
     }
