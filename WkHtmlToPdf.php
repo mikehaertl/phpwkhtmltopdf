@@ -4,91 +4,8 @@
  *
  * This class is a slim wrapper around wkhtmltopdf.
  *
- * It provides a simple and clean interface to ease PDF creation with wkhtmltopdf.
- * The wkhtmltopdf binary must be installed and working on your system. The static
- * binary is preferred but this class should also work with the non static version,
- * even though a lot of features will be missing.
- *
- * Basic use
- * ---------
- *
- *      $pdf = new WkHtmlToPdf;
- *
- *      // Add a HTML file, a HTML string or a page from URL
- *      $pdf->addPage('/home/joe/page.html');
- *      $pdf->addPage('<html>....</html>');
- *      $pdf->addPage('http://google.com');
- *
- *      // Add a cover (same sources as above are possible)
- *      $pdf->addCover('mycover.html');
- *
- *      // Add a Table of contents
- *      $pdf->addToc();
- *
- *      // Save the PDF
- *      $pdf->saveAs('/tmp/new.pdf');
- *
- *      // ... or send to client for inline display
- *      $pdf->send();
- *
- *      // ... or send to client as file download
- *      $pdf->send('test.pdf');
- *
- *
- * Setting options
- * ---------------
- *
- * The wkhtmltopdf binary knows different types of options (please see wkhtmltopdf -H):
- *
- *      * global options (e.g. to set the document's DPI)
- *      * page options (e.g. to supply a custom CSS file for a page)
- *      * toc options (e.g. to set a TOC header)
- *
- * In addition this class also supports global page options: You can set default page options
- * that will be applied to every page you add. You can also override these defaults per page:
- *
- *      $pdf = new WkHtmlToPdf($options);   // Set global PDF options
- *      $pdf->setOptions($options);         // Set global PDF options (alternative)
- *      $pdf->setPageOptions($options);     // Set default page options
- *      $pdf->addPage($page, $options);     // Add page with options (overrides default page options)
- *      $pdf->addCover($page, $options);    // Add cover with options (overrides default page options)
- *      $pdf->addToc($options);             // Add TOC with options
- *
- *
- * Special global options
- * ----------------------
- *
- *  * binPath:          Full path to the wkhtmltopdf binary. Required on Windows system and
- *                      optionally autodetected if not set on other OS.
- *  * binName:          Base name of the binary to use for autodetection. Default is `wkhtmltopdf`.
- *  * tmp:              Path to tmp directory. Defaults to PHP temp dir.
- *  * enableEscaping:   Whether arguments to wkhtmltopdf should be escaped. Default is true.
- *  * version9:         Whether to use command line syntax for wkhtmltopdf < 0.10
- *  * procEnv:          optional array with environment variables for the proc_open() call
- *
- *
- * Error handling
- * --------------
- *
- * saveAs() and send() will return false on error. In this case the detailed error message
- * from wkhtmltopdf can be obtained through getError():
- *
- *      if (!$pdf->send()) {
- *          throw new Exception('Could not create PDF: '.$pdf->getError());
- *      }
- *
- *
- * Note for Windows users
- * ----------------------
- *
- * If you use double quotes (") or percent signs (%) as option values, they may get
- * converted to spaces. You can set `enableEscaping` to `false` in this case. But
- * then you have to take care of proper escaping yourself. In some cases it may be
- * neccessary to surround your argument values with extra double quotes.
- *
- *
  * @author Michael Härtl <haertl.mike@gmail.com> (sponsored by PeoplePerHour.com)
- * @version 1.1.7-dev
+ * @version 1.2.0-dev
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
@@ -109,6 +26,10 @@ class WkHtmlToPdf
 
     protected $procEnv;
 
+    protected $isWindows;
+
+    protected $xvfbBin;
+
     protected $error;
 
     protected $localOptions = array(
@@ -118,6 +39,7 @@ class WkHtmlToPdf
         'enableEscaping',
         'version9',
         'procEnv',
+        'xvfbBin',
     );
 
     // Regular expression to detect HTML strings
@@ -257,13 +179,39 @@ class WkHtmlToPdf
     public function getBin()
     {
         if ($this->binPath===null) {
-            if (strtoupper(substr(PHP_OS, 0, 3))==='WIN') {
+            if ($this->getIsWindows()) {
                 return '';
             } else {
                 $this->binPath = trim(shell_exec('which '.$this->binName));
             }
         }
         return $this->binPath;
+    }
+
+    /**
+     * @return string the full path to the xvfb-run binary
+     */
+    public function getXvfbBin()
+    {
+        if ($this->xvfbBin===null) {
+            if ($this->getIsWindows()) {
+                return '';
+            } else {
+                $this->xvfbBin = trim(shell_exec('which xvfb-run'));
+            }
+        }
+        return $this->xvfbBin;
+    }
+
+    /**
+     * @return bool whether we're on a Windows OS
+     */
+    public function getIsWindows()
+    {
+        if ($this->isWindows===null) {
+            $this->isWindows = strtoupper(substr(PHP_OS, 0, 3))==='WIN';
+        }
+        return $this->isWindows;
     }
 
     /**
