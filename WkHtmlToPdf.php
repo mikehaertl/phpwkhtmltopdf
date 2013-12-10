@@ -58,11 +58,13 @@
  * Special global options
  * ----------------------
  *
- *  * binPath:          Full path to the wkhtmltopdf binary. Will get autodetected on non Windows systems.
+ *  * binPath:          Full path to the wkhtmltopdf binary. Required on Windows system and
+ *                      optionally autodetected if not set on other OS.
  *  * binName:          Base name of the binary to use for autodetection. Default is `wkhtmltopdf`.
  *  * tmp:              Path to tmp directory. Defaults to PHP temp dir.
  *  * enableEscaping:   Whether arguments to wkhtmltopdf should be escaped. Default is true.
  *  * version9:         Whether to use command line syntax for wkhtmltopdf < 0.10
+ *  * procEnv:          optional array with environment variables for the proc_open() call
  *
  *
  * Error handling
@@ -105,7 +107,18 @@ class WkHtmlToPdf
     protected $tmpFile;
     protected $tmpFiles = array();
 
+    protected $procEnv;
+
     protected $error;
+
+    protected $localOptions = array(
+        'binName',
+        'binPath',
+        'tmp',
+        'enableEscaping',
+        'version9',
+        'procEnv',
+    );
 
     // Regular expression to detect HTML strings
     const REGEX_HTML = '/<html/i';
@@ -220,16 +233,8 @@ class WkHtmlToPdf
     public function setOptions($options)
     {
         foreach ($options as $key=>$val) {
-            if ($key==='binName') {
-                $this->binName = $val;
-            } elseif ($key==='binPath') {
-                $this->binPath = $val;
-            } elseif ($key==='tmp') {
-                $this->tmp = $val;
-            } elseif ($key==='enableEscaping') {
-                $this->enableEscaping = (bool)$val;
-            } elseif ($key==='version9') {
-                $this->version9 = (bool)$val;
+            if(in_array($key, $this->localOptions)) {
+                $this->$key = $val;
             } elseif (is_int($key)) {
                 $this->options[] = $val;
             } else {
@@ -330,7 +335,7 @@ class WkHtmlToPdf
         $descriptors = array(
             2   => array('pipe','w'),
         );
-        $process = proc_open($command, $descriptors, $pipes, null, null, array('bypass_shell'=>true));
+        $process = proc_open($command, $descriptors, $pipes, null, $this->procEnv, array('bypass_shell'=>true));
 
         if (is_resource($process)) {
 

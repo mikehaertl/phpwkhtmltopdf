@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 1.1.7
+
+ * Issue #27: Add autodetection of wkhtmltopdf binary on Unix based systems (thanks eusonlito)
+ * Issue #28: Implement optional passing of environment variables to proc_open (thanks eusonlito)
+
+## 1.1.6
+
+ * Issue #21: Add support for wkhtmltopdf 0.9 versions
+
 ## 1.1.5
 
  * Add composer autoloading (thanks igorw)
