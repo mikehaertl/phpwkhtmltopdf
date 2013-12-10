@@ -58,10 +58,11 @@
  * Special global options
  * ----------------------
  *
- *  * bin:              Path to the wkhtmltopdf binary. Defaults to /usr/bin/wkhtmltopdf.
+ *  * binPath:          Full path to the wkhtmltopdf binary. Will get autodetected on non Windows systems.
+ *  * binName:          Base name of the binary to use for autodetection. Default is `wkhtmltopdf`.
  *  * tmp:              Path to tmp directory. Defaults to PHP temp dir.
  *  * enableEscaping:   Whether arguments to wkhtmltopdf should be escaped. Default is true.
- *  * version9:         Whether to use command line syntax for wkhtmltopdf < 0.10 
+ *  * version9:         Whether to use command line syntax for wkhtmltopdf < 0.10
  *
  *
  * Error handling
@@ -90,7 +91,8 @@
  */
 class WkHtmlToPdf
 {
-    protected $bin = '/usr/bin/wkhtmltopdf';
+    protected $binPath;
+    protected $binName = 'wkhtmltopdf';
 
     protected $enableEscaping = true;
     protected $version9 = false;
@@ -218,25 +220,20 @@ class WkHtmlToPdf
     public function setOptions($options)
     {
         foreach ($options as $key=>$val) {
-            switch ($key) {
-                case 'bin':
-                    $this->bin = $val;
-                    break;
-                case 'tmp':
-                    $this->tmp = $val;
-                    break;
-                case 'enableEscaping':
-                    $this->enableEscaping = (bool)$val;
-                    break;
-                case 'version9':
-                    $this->version9 = (bool)$val;
-                    break;
-                default:
-                    if (is_int($key)) {
-                        $this->options[] = $val;
-                    } else {
-                        $this->options[$key] = $val;
-                    }
+            if ($key==='binName') {
+                $this->binName = $val;
+            } elseif ($key==='binPath') {
+                $this->binPath = $val;
+            } elseif ($key==='tmp') {
+                $this->tmp = $val;
+            } elseif ($key==='enableEscaping') {
+                $this->enableEscaping = (bool)$val;
+            } elseif ($key==='version9') {
+                $this->version9 = (bool)$val;
+            } elseif (is_int($key)) {
+                $this->options[] = $val;
+            } else {
+                $this->options[$key] = $val;
             }
         }
     }
@@ -247,6 +244,21 @@ class WkHtmlToPdf
     public function setPageOptions($options=array())
     {
         $this->pageOptions = $options;
+    }
+
+    /**
+     * @return string the full path to the wkhtmltopdf binary.
+     */
+    public function getBin()
+    {
+        if ($this->binPath===null) {
+            if (strtoupper(substr(PHP_OS, 0, 3))==='WIN') {
+                return '';
+            } else {
+                $this->binPath = trim(shell_exec('which '.$this->binName));
+            }
+        }
+        return $this->binPath;
     }
 
     /**
@@ -275,7 +287,7 @@ class WkHtmlToPdf
      */
     public function getCommand($filename)
     {
-        $command = $this->enableEscaping ? escapeshellarg($this->bin) : $this->bin;
+        $command = $this->enableEscaping ? escapeshellarg($this->getBin()) : $this->getBin();
 
         $command .= $this->renderOptions($this->options);
 
