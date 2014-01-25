@@ -1,9 +1,14 @@
 # CHANGELOG
 
-## 1.1.7
+## 1.2.0
+
+A minor change in the options was introduced in this release. If you used the `bin`
+option before you have to rename it to `binPath` now. Please check the docs for
+full documentation.
 
  * Issue #27: Add autodetection of wkhtmltopdf binary on Unix based systems (thanks eusonlito)
  * Issue #28: Implement optional passing of environment variables to proc_open (thanks eusonlito)
+ * Issue #30: Bug with options without an argument
 
 ## 1.1.6
 
