@@ -155,7 +155,7 @@ class WkHtmlToPdf
     public function setOptions($options)
     {
         foreach ($options as $key=>$val) {
-            if(in_array($key, $this->localOptions)) {
+            if(in_array($key, $this->localOptions, true)) {
                 $this->$key = $val;
             } elseif (is_int($key)) {
                 $this->options[] = $val;
