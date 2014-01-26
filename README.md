@@ -164,6 +164,9 @@ To enable the built in support you have to set `enableXvfb`. There are also some
 ```php
 <?php
 $pdf = new WkHtmlToPdf(array(
+    // Explicitly tell wkhtmltopdf that we're using an X environment
+    'use-xserver',
+
     // Enable built in Xvfb support
     'enableXvfb' => true,
 
@@ -191,7 +194,8 @@ rendering. This is done via an environment variable.
 ```php
 <?php
 $pdf = new WkHtmlToPdf(array(
-    'procEnv' => array( 'DISPLAY' => ':0' ),
+    'use-xserver',                                              
+    'procEnv' => array( 'DISPLAY' => ':0' ),  //You can change ':0' to whatever display you pick in your daemon script
 ));
 ```
 
