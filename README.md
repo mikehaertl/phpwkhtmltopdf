@@ -4,7 +4,7 @@ PHP WkHtmlToPdf
 PHP WkHtmlToPdf provides a simple and clean interface to ease PDF creation with
 [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/).
 
-**The [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/) binary must be installed and working on your system.**
+**The [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/) command must be installed and working on your system.**
 See the section below for details.
 
 ## Quickstart
@@ -39,7 +39,7 @@ $pdf->send('test.pdf');
 
 ## Setting options
 
-The wkhtmltopdf binary accepts different types of options:
+The `wkhtmltopdf` shell command accepts different types of options:
 
  * global options (e.g. to set the document's DPI)
  * page options (e.g. to supply a custom CSS file for a page)
@@ -75,29 +75,25 @@ $pdf->addToc($tocOptions);              // Add TOC with options
 
 ## Special global options
 
-There are some special options to configure PHP WkHtmlToPdf. They can be passed to the constructor
+There are some special options to configure PHP wrapper. They can be passed to the constructor
 or be set via `setOptions()`:
 
- * `binPath`: Full path to the wkhtmltopdf binary. Required on Windows systems and optionally autodetected if not set on other OS.
+ * `binPath`: Full path to the `wkhtmltopdf` shell command. Required on Windows systems and optionally autodetected if not set on other OS.
  * `binName`: Base name of the binary to use for autodetection. Default is `wkhtmltopdf`.
  * `tmp`: Path to tmp directory. Defaults to the PHP temp dir.
  * `enableEscaping`: Whether arguments to wkhtmltopdf should be escaped. Default is true.
  * `version9`: Whether to use command line syntax for wkhtmltopdf < 0.10.
- * `procEnv`: Optional array with environment variables for the `proc_open()` call.
+ * `procEnv`: Optional array with environment variables for shell command.
+ * `enableXvfb`: Whether to use the built in Xvfb support (see below). Default is false.
+ * `xvfbRunBin`: Path to `xvfb-run` binary (see below). Default is to autodetect the binary.
+ * `xvfbRunOptions`: Options for the `xvfb-run` command (see below). Default is
+   ` --server-args="-screen 0, 1024x768x24" `.
 
-If you installed `wkhtmltopdf` via composer, you have to set `binPath` to the right binary:
-
-```php
-$pdf = new WkHtmlToPdf(array(
-   // Use `wkhtmltopdf-i386` or `wkhtmltopdf-amd64`
-   'binPath' => 'path/to/vendor/bin/wkhtmltopdf-i386'
-));
-```
 
 ## Error handling
 
-`saveAs()` and `save()` will return false on error. In this case the detailed error message from
-wkhtmltopdf can be obtained through `getError()`:
+`send()`, `saveAs()` and `save()` will return false on error. In this case the detailed error message from
+`wkhtmltopdf` is available from `getError()`:
 
 ```php
 <?php
@@ -117,24 +113,23 @@ I also found that some options don't work on Windows (tested with wkhtmltopdf 0.
 `user-style-sheet` option described below.
 
 
-## How to install the `wkhtmltopdf` binary
+## Setup for different wkhtmltopdf versions
 
 As mentioned before the PHP class is just a convenient frontend for the `wkhtmltopdf` command. So you need to
-install it on your system before you can use the class. On Linux there are two flavours of this binary:
+install this command on your system before you can use the class. On Linux there are two flavours:
 
- *  Statically linked: Instead of installing the package you can also download a statically linked version
-    from [wkhtmltopdf's homepage](https://code.google.com/p/wkhtmltopdf/). This will not require any X server
-    and thus is the recommended way to use the class.
+ *  Statically linked: You install a statically linked version via compose or download it from their
+    homepage. It's self-contained and thus the recommended way to use the class on most webservers.
  *  Dynamically linked: This is what you get for example on Ubuntu if you install the wkhtmltopdf package.
-    It will work, but requires an X server which is usually not available on headless webservers. We have
-    integrated a workaround for this that uses a virtual X framebuffer (Xvfb) which we will describe below.
+    It will work, but requires an X server which is usually not available on headless webservers. We provide
+    two Xvfb based workarounds below.
 
 ### Statically linked binary
 
-You can either download and unzip the correct package for your architecture from
-[https://code.google.com/p/wkhtmltopdf/](https://code.google.com/p/wkhtmltopdf/)
-or use `composer` to install the binaries from `h4cc/wkhtmltopdf-i386` or `h4cc/wkhtmltopdf-amd64`.
-In both cases you have to tell the class where to find the binary.
+You can use `composer` to install the binaries from `h4cc/wkhtmltopdf-i386` or `h4cc/wkhtmltopdf-amd64`.
+Or you can manually download and unzip the correct package for your architecture from
+[https://code.google.com/p/wkhtmltopdf/](https://code.google.com/p/wkhtmltopdf/).
+In both cases you have to tell the PHP class where to find the binary.
 
 ```php
 <?php
@@ -144,22 +139,25 @@ $pdf = new WkHtmlToPdf(array(
 ));
 ```
 
+If you put the class somewhere in your `$PATH` directories it should even get autodetected. You may
+have to set the correct name of the binary, though (e.g. `'binName' => 'wkhtmltopdf-amd64',`).
+
 ### Dynamically linked binary with Xvfb
 
-If you have to use the dynamically linked binary as provided by some Linux versions, you have two
-options. You can use
+If you have to use the dynamically linked binary as it is provided by some Linux versions, you have two
+options. You can either use
 
  * the built in Xvfb support or
- * a standalone Xvfb server
+ * a standalone Xvfb server.
 
-Both require the Xvfb package to be available on the system and both also have some drawbacks.
+Both require the Xvfb package to be installed on the system and both also have some drawbacks.
 
 #### Built in Xvfb support
 
-This wraps each call to `wkhtmltopdf` in `xvfb-run`. The latter will run an X instance without
-all the overhead of a full X session. The drawback here is, that a new session is fired up for
-each an every PDF you create, which will create quite some extra load on your CPU. So this setup
-is only recommended for low frequency sites.
+This wraps each call to `wkhtmltopdf` with [xvfb-run](http://manpages.ubuntu.com/manpages/lucid/man1/xvfb-run.1.html).
+`xvfb-run` will run any given command in a X environment without all the overhead of a full X session.
+The drawback with this solution is, that there's still a new session fired up for each an every PDF you create,
+which will create quite some extra load on your CPU. So this setup is only recommended for low frequency sites.
 
 To enable the built in support you have to set `enableXvfb`. There are also some options you can set.
 
@@ -173,18 +171,18 @@ $pdf = new WkHtmlToPdf(array(
     'xvfbRunBin' => '/usr/bin/xvfb-run',
 
     // By default the following options are passed to xvfb-run.
-    // So only use this option if you want/have to change this.
+    // So only use this option if you want/have to change them.
     'xvfbRunOptions' =>  ' --server-args="-screen 0, 1024x768x24" ',
 ));
 ```
 
-#### Using a standalone Xvfb process
+#### Standalone Xvfb
 
-A better way might be, to start a Xvfb process once and reuse it for all your PHP requests
+It's better to start a Xvfb process once and reuse it for all your PHP requests
 (thanks to Larry Williamson for [the original idea](https://coderwall.com/p/tog9eq)).
 This requires that you have root access to your machine as you have to add a startup script
 for that process. We have provided an example script for Ubuntu [here](https://gist.github.com/eusonlito/7889622)
-(Thanks eusonlito). You can put to `/etc/init.d/` and add it to your startup files with
+(Thanks eusonlito). You can put it to `/etc/init.d/xvfb` and add it to your startup files with
 `update-rc.d xvfb defaults 10`. It should be easy to adapt the script for other Linux versions.
 
 If your `Xvfb` process is running, you just have to tell the class to use this X display for
