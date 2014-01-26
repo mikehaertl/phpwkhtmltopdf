@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.1
+
+ * Issue #29: Add Xvfb support
+
 ## 1.2.0
 
 A minor change in the options was introduced in this release. If you used the `bin`

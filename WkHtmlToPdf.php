@@ -4,8 +4,8 @@
  *
  * This class is a slim wrapper around wkhtmltopdf.
  *
- * @author Michael Härtl <haertl.mike@gmail.com> (sponsored by PeoplePerHour.com)
- * @version 1.2.0
+ * @author Michael Härtl <haertl.mike@gmail.com>
+ * @version 1.2.1-dev
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
@@ -28,7 +28,9 @@ class WkHtmlToPdf
 
     protected $isWindows;
 
-    protected $xvfbBin;
+    protected $enableXvfb = false;
+    protected $xvfbRunBin;
+    protected $xvfbRunOptions = ' --server-args="-screen 0, 1024x768x24" ';
 
     protected $error;
 
@@ -39,7 +41,9 @@ class WkHtmlToPdf
         'enableEscaping',
         'version9',
         'procEnv',
-        'xvfbBin',
+        'enableXvfb',
+        'xvfbRunBin',
+        'xvfbRunOptions',
     );
 
     // Regular expression to detect HTML strings
@@ -191,16 +195,16 @@ class WkHtmlToPdf
     /**
      * @return string the full path to the xvfb-run binary
      */
-    public function getXvfbBin()
+    public function getXvfbRunBin()
     {
-        if ($this->xvfbBin===null) {
+        if ($this->xvfbRunBin===null) {
             if ($this->getIsWindows()) {
-                return '';
+                return null;
             } else {
-                $this->xvfbBin = trim(shell_exec('which xvfb-run'));
+                $this->xvfbRunBin = trim(shell_exec('which xvfb-run'));
             }
         }
-        return $this->xvfbBin;
+        return $this->xvfbRunBin;
     }
 
     /**
@@ -279,6 +283,10 @@ class WkHtmlToPdf
     {
         $command = $this->getCommand($fileName);
 
+        if($this->enableXvfb) {
+            $command = $this->xvfbRunCommand($command);
+        }
+
         // we use proc_open with pipes to fetch error output
         $descriptors = array(
             2   => array('pipe','w'),
@@ -338,5 +346,21 @@ class WkHtmlToPdf
             }
 
         return $out;
+    }
+
+    /**
+     * Wrap the given command in a call to xvfb-run
+     *
+     * @param string $command the command to wrap in xvfb-run
+     * @return string the command string with the xvfb-run call prepended
+     */
+    protected function xvfbRunCommand($command)
+    {
+        $xvfbRun = $this->getXvfbRunBin();
+        if(!$xvfbRun) {
+            return $command;
+        }
+
+        return $xvfbRun.$this->xvfbRunOptions.$command;
     }
 }
