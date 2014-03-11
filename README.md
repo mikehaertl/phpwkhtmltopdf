@@ -84,8 +84,8 @@ $pdf->addPage($page, array(
     ),
     // Repeatable options with single argument
     'run-script' => array(
-        'local1.js,
-        'local2.js,
+        'local1.js',
+        'local2.js',
     ),
 ));
 ```
