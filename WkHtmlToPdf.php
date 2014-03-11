@@ -127,10 +127,11 @@ class WkHtmlToPdf
     /**
      * Send PDF to client, either inline or as download (triggers PDF creation)
      *
-     * @param mixed $filename the filename to send. If empty, the PDF is streamed.
+     * @param mixed $filename the filename to send. If empty, the PDF is streamed inline.
+     * @param bool $inline whether to force inline display of the PDF, even if filename is present.
      * @return bool whether PDF was created successfully
      */
-    public function send($filename=null)
+    public function send($filename=null,$inline=false)
     {
         if (($pdfFile = $this->getPdfFilename())===false) {
             return false;
@@ -143,8 +144,9 @@ class WkHtmlToPdf
         header('Content-Transfer-Encoding: binary');
         header('Content-Length: '.filesize($pdfFile));
 
-        if ($filename!==null) {
-            header("Content-Disposition: attachment; filename=\"$filename\"");
+        if ($filename!==null || $inline) {
+            $disposition = $inline ? 'inline' : 'attachment';
+            header("Content-Disposition: $inline; filename=\"$filename\"");
         }
 
         readfile($pdfFile);

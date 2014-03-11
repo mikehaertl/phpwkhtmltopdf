@@ -2,7 +2,8 @@
 
 ## 1.2.2
 
- * Issue #30: Support repeatable wkhtmltopdf options
+ * Issue #34: Allow to set filename even when PDF is streamed inline
+ * Issue #35: Support repeatable wkhtmltopdf options
 
 ## 1.2.1
 
