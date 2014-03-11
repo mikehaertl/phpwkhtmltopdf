@@ -73,6 +73,23 @@ Toc options can be passed to `addToc()`:
 $pdf->addToc($tocOptions);              // Add TOC with options
 ```
 
+Since 1.2.2 you can also pass repeatable options like `cookie` or `run-script`:
+
+```php
+$pdf->addPage($page, array(
+    // Repeatable options with <name> <value> arguments
+    'cookie' => array(
+        'PHPSESSID' => $session_id,
+        'marketing_flag' => 1,
+    ),
+    // Repeatable options with single argument
+    'run-script' => array(
+        'local1.js,
+        'local2.js,
+    ),
+));
+```
+
 ## Special global options
 
 There are some special options to configure PHP wrapper. They can be passed to the constructor

@@ -5,7 +5,7 @@
  * This class is a slim wrapper around wkhtmltopdf.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @version 1.2.1
+ * @version 1.2.2-dev
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
@@ -261,7 +261,7 @@ class WkHtmlToPdf
     /**
      * @return mixed the temporary PDF filename or false on error (triggers PDf creation)
      */
-    protected function getPdfFilename()
+    public function getPdfFilename()
     {
         if ($this->tmpFile===null) {
             $tmpFile = tempnam($this->getTmpDir(),'tmp_WkHtmlToPdf_');
@@ -341,11 +341,28 @@ class WkHtmlToPdf
         foreach($options as $key=>$val)
             if (is_numeric($key)) {
                 $out .= " --$val";
+            } elseif (is_array($val)) {
+                foreach($val as $vkey => $vval) {
+                    if(is_numeric($vkey)) {
+                        $out .= " --$key ".$this->escape($vval);
+                    } else {
+                        $out .= " --$key ".$this->escape($vkey).' '.$this->escape($vval);
+                    }
+                }
             } else {
-                $out .= " --$key ".($this->enableEscaping ? escapeshellarg($val) : $val);
+                $out .= " --$key ".$this->escape($val);
             }
 
         return $out;
+    }
+
+    /**
+     * @param mixed $val value to escape
+     * @return string the escaped value if enableEscaping is set. Unchanged value otherwhise.
+     */
+    protected function escape($val)
+    {
+        return $this->enableEscaping ? escapeshellarg($val) : $val;
     }
 
     /**

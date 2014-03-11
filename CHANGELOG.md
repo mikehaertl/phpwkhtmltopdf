@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.2
+
+ * Issue #30: Support repeatable wkhtmltopdf options
+
 ## 1.2.1
 
  * Issue #29: Add Xvfb support
