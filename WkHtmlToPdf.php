@@ -5,7 +5,7 @@
  * This class is a slim wrapper around wkhtmltopdf.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @version 1.2.2
+ * @version 1.2.3
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
@@ -146,7 +146,7 @@ class WkHtmlToPdf
 
         if ($filename!==null || $inline) {
             $disposition = $inline ? 'inline' : 'attachment';
-            header("Content-Disposition: $inline; filename=\"$filename\"");
+            header("Content-Disposition: $disposition; filename=\"$filename\"");
         }
 
         readfile($pdfFile);

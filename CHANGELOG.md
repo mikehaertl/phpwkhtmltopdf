@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.3
+
+ * Issue #36: Bugfix in send()
+
 ## 1.2.2
 
  * Issue #34: Allow to set filename even when PDF is streamed inline
