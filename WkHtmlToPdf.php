@@ -188,7 +188,8 @@ class WkHtmlToPdf
     public function processOptions($options=array())
     {
         foreach ($options as $key=>$val) {
-            if (preg_match('/^(header|footer)-html$/', $key) && preg_match(self::REGEX_HTML, $val)) {
+            if (preg_match('/^(header|footer)-html$/', $key) &&
+                !(is_file($val) || preg_match('/^(https?:)?\/\//i',$val) || $val===strip_tags($val))) {
                 $options[$key] = $this->createTmpFile($val);
             }
         }
