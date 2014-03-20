@@ -82,7 +82,7 @@ class WkHtmlToPdf
     public function addPage($input,$options=array())
     {
         $options['input'] = preg_match(self::REGEX_HTML, $input) ? $this->createTmpFile($input) : $input;
-        $this->objects[] = array_merge($this->pageOptions,$options);
+        $this->objects[] = array_merge($this->pageOptions,$this->processOptions($options));
     }
 
     /**
@@ -158,8 +158,9 @@ class WkHtmlToPdf
      *
      * @param array $options list of global options to set as name/value pairs
      */
-    public function setOptions($options)
+    public function setOptions($options=array())
     {
+        $options = $this->processOptions($options);
         foreach ($options as $key=>$val) {
             if(in_array($key, $this->localOptions, true)) {
                 $this->$key = $val;
@@ -176,7 +177,24 @@ class WkHtmlToPdf
      */
     public function setPageOptions($options=array())
     {
-        $this->pageOptions = $options;
+        $this->pageOptions = $this->processOptions($options);
+    }
+
+    /**
+     * @param array $options list of options as name/value pairs
+     * 
+     * @return array options processed
+     */
+    public function processOptions($options=array())
+    {
+        foreach ($options as $key=>$val) {
+            if (preg_match('/^(header|footer)-html$/', $key) &&
+                !(is_file($val) || preg_match('/^(https?:)?\/\//i',$val) || $val===strip_tags($val))) {
+                $options[$key] = $this->createTmpFile($val);
+            }
+        }
+
+        return $options;
     }
 
     /**
