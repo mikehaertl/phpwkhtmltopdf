@@ -90,6 +90,9 @@ $pdf->addPage($page, array(
 ));
 ```
 
+And since 1.2.4 you can also supply a custom HTML string as `header-html` and
+`footer-html`. The string must contain at least one HTML tag, though.
+
 ## Special global options
 
 There are some special options to configure PHP wrapper. They can be passed to the constructor

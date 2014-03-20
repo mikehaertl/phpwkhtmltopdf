@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.4
+
+ * Add support for HTML strings in html-footer and html-header
+
 ## 1.2.3
 
  * Issue #36: Bugfix in send()

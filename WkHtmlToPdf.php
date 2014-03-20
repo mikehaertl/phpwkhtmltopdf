@@ -5,7 +5,7 @@
  * This class is a slim wrapper around wkhtmltopdf.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @version 1.2.3
+ * @version 1.2.4
  * @license http://www.opensource.org/licenses/MIT
  */
 class WkHtmlToPdf
