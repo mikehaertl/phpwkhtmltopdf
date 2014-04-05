@@ -52,9 +52,9 @@ class DirWkHtmlToPdf {
 	 */
 	private function getFilesIterator() {
 		$pattern = '/^.+\.'.$this->extension.'$/i';
-		$directory = new RecursiveDirectoryIterator($this->inputDir);
-		$iterator = new RecursiveIteratorIterator($directory);
-		$regex = new RegexIterator($iterator, $pattern, RecursiveRegexIterator::GET_MATCH);
+		$directory = new \RecursiveDirectoryIterator($this->inputDir);
+		$iterator = new \RecursiveIteratorIterator($directory);
+		$regex = new \RegexIterator($iterator, $pattern, \RecursiveRegexIterator::GET_MATCH);
 
 		return $regex;
 	}
