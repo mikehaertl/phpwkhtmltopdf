@@ -4,7 +4,8 @@
 // require_once('Behavior/PdfBehavior.php');
 
 namespace WkHtmlToPdf;
-use WkHtmlToPdf\Behavior;
+use WkHtmlToPdf\Behavior\ImageBehavior;
+use WkHtmlToPdf\Behavior\PdfBehavior;
 
 
 /**
