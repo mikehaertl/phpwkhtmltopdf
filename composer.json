@@ -19,7 +19,7 @@
         "php": ">=5.0.0"
     },
     "autoload": {
-        "psr-0": { "WkHtmlToPdf\\": "/" }
+        "psr-0": { "WkHtmlToPdf\\": "." }
     },
     "suggest": {
         "h4cc/wkhtmltopdf-i386": "wkhtmltopdf static linked linux binary for i386 systems.",
