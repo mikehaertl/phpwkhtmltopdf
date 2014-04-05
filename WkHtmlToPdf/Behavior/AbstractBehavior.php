@@ -1,14 +1,17 @@
 <?php
+
+namespace WkHtmlToPdf\Behavior;
+
 /**
- * WkHtmlToPdf
+ * AbstractBehavior
  *
- * This class is a slim wrapper around wkhtmltopdf.
+ * This class is abstract behavior for slim wrapper around wkhtmltopdf
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @version 1.2.5-dev
+ * @author Oleksandr Knyga <oleksandrknyga@gmail.com>
  * @license http://www.opensource.org/licenses/MIT
  */
-class WkHtmlToPdf
+abstract class AbstractBehavior
 {
     protected $binPath;
     protected $binName = 'wkhtmltopdf';
@@ -60,7 +63,7 @@ class WkHtmlToPdf
     }
 
     /**
-     * Remove temporary PDF file and pages when script completes
+     * Remove temporary file and pages when script completes
      */
     public function __destruct()
     {
@@ -109,47 +112,47 @@ class WkHtmlToPdf
     }
 
     /**
-     * Save the PDF to given filename (triggers PDF creation)
+     * Save the file to given filename (triggers file creation)
      *
-     * @param string $filename to save PDF as
-     * @return bool whether PDF was created successfully
+     * @param string $filename to save file
+     * @return bool whether file was created successfully
      */
     public function saveAs($filename)
     {
-        if (($pdfFile = $this->getPdfFilename())===false) {
+        if (($file = $this->getFilename())===false) {
             return false;
         }
 
-        copy($pdfFile,$filename);
+        copy($file,$filename);
         return true;
     }
 
     /**
-     * Send PDF to client, either inline or as download (triggers PDF creation)
+     * Send file to client, either inline or as download (triggers file creation)
      *
-     * @param mixed $filename the filename to send. If empty, the PDF is streamed inline.
-     * @param bool $inline whether to force inline display of the PDF, even if filename is present.
-     * @return bool whether PDF was created successfully
+     * @param mixed $filename the filename to send. If empty, the file is streamed inline.
+     * @param bool $inline whether to force inline display of the file, even if filename is present.
+     * @return bool whether file was created successfully
      */
     public function send($filename=null,$inline=false)
     {
-        if (($pdfFile = $this->getPdfFilename())===false) {
+        if (($file = $this->getFilename())===false) {
             return false;
         }
 
         header('Pragma: public');
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Content-Type: application/pdf');
+        header('Content-Type: '.$this->getContentType());
         header('Content-Transfer-Encoding: binary');
-        header('Content-Length: '.filesize($pdfFile));
+        header('Content-Length: '.filesize($file));
 
         if ($filename!==null || $inline) {
             $disposition = $inline ? 'inline' : 'attachment';
             header("Content-Disposition: $disposition; filename=\"$filename\"");
         }
 
-        readfile($pdfFile);
+        readfile($file);
         return true;
     }
 
@@ -259,34 +262,14 @@ class WkHtmlToPdf
     }
 
     /**
-     * @param string $filename the filename of the output file
-     * @return string the wkhtmltopdf command string
+     * @return mixed the temporary file filename or false on error (triggers file creation)
      */
-    public function getCommand($filename)
-    {
-        $command = $this->enableEscaping ? escapeshellarg($this->getBin()) : $this->getBin();
-
-        $command .= $this->renderOptions($this->options);
-
-        foreach($this->objects as $object)
-        {
-            $command .= ' '.$object['input'];
-            unset($object['input']);
-            $command .= $this->renderOptions($object);
-        }
-
-        return $command.' '.$filename;
-    }
-
-    /**
-     * @return mixed the temporary PDF filename or false on error (triggers PDf creation)
-     */
-    public function getPdfFilename()
+    public function getFilename()
     {
         if ($this->tmpFile===null) {
             $tmpFile = tempnam($this->getTmpDir(),'tmp_WkHtmlToPdf_');
 
-            if ($this->createPdf($tmpFile)===true) {
+            if ($this->createFile($tmpFile)===true) {
                 $this->tmpFile = $tmpFile;
             } else {
                 return false;
@@ -297,9 +280,9 @@ class WkHtmlToPdf
     }
 
     /**
-     * Create the temporary PDF file
+     * Create the temporary file
      */
-    protected function createPdf($fileName)
+    protected function createFile($fileName)
     {
         $command = $this->getCommand($fileName);
 
@@ -324,7 +307,7 @@ class WkHtmlToPdf
                 if (!file_exists($fileName) || filesize($fileName)===0) {
                     $this->error = "Could not run command $command:\n$stderr";
                 } else {
-                    $this->error = "Warning: an error occured while creating the PDF.\n$stderr";
+                    $this->error = "Warning: an error occured while creating the file.\n$stderr";
                 }
             }
         } else {
