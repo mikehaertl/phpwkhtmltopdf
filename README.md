@@ -98,7 +98,7 @@ And since 1.2.4 you can also supply a custom HTML string as `header-html` and
 There are some special options to configure PHP wrapper. They can be passed to the constructor
 or be set via `setOptions()`:
 
- * `binPath`: Full path to the `wkhtmltopdf` shell command. Required on Windows systems and optionally autodetected if not set on other OS.
+ * `binPath`: Full path to the `wkhtmltopdf` or `wkhtmltoimage` shell command. Required on Windows systems and optionally autodetected if not set on other OS.
  * `binName`: Base name of the binary to use for autodetection. Default is `wkhtmltopdf`.
  * `tmp`: Path to tmp directory. Defaults to the PHP temp dir.
  * `enableEscaping`: Whether arguments to wkhtmltopdf should be escaped. Default is true.
@@ -122,6 +122,22 @@ if (!$pdf->send()) {
 }
 ```
 
+## Image/PDF
+
+You can switch between PDF and image rendering by adding 2nd argument in constructor. Default is PDF.
+```php
+<?php
+
+//PDF file will be generated
+$pdf = new WkHtmlToPdf;
+
+//PDF file will be generated
+$pdf = new WkHtmlToPdf(array(), WkHtmlToPdf::PDF);
+
+//Image file will be generated
+$img = new WkHtmlToPdf(array(), WkHtmlToPdf::IMAGE);
+
+```
 
 ## Note for Windows users
 
