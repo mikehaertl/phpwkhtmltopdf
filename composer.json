@@ -1,14 +1,18 @@
 {
-    "name": "mikehaertl/phpwkhtmltopdf",
+    "name": "oleksandrknyga/phpwkhtmltopdf",
     "description": "A slim PHP wrapper around wkhtmltopdf with an easy to use and clean OOP interface",
     "keywords": ["pdf"],
-    "homepage": "http://mikehaertl.github.com/phpwkhtmltopdf/",
+    "homepage": "http://oleksandrknyga.github.com/phpwkhtmltopdf/",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
             "name": "Michael Haertl",
             "email": "haertl.mike@gmail.com"
+        },
+        {
+            "name": "Oleksandr Knyga",
+            "email": "oleksandrknyga@gmail.com"
         }
     ],
     "require": {

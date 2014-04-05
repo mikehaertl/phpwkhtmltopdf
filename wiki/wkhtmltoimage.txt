@@ -1,0 +1,34 @@
+Name:
+  wkhtmltoimage 0.12.0 final
+
+Synopsis:
+  wkhtmltoimage [OPTIONS]... <input file> <output file>
+  
+Description:
+  Converts an HTML page into an image, 
+
+General Options:
+      --crop-h <int>                  Set height for cropping
+      --crop-w <int>                  Set width for cropping
+      --crop-x <int>                  Set x coordinate for cropping
+      --crop-y <int>                  Set y coordinate for cropping
+  -H, --extended-help                 Display more extensive help, detailing
+                                      less common command switches
+  -f, --format <format>               Output file format
+      --height <int>                  Set screen height (default is calculated
+                                      from page content) (default 0)
+  -h, --help                          Display help
+      --quality <int>                 Output image quality (between 0 and 100)
+                                      (default 94)
+  -q, --quiet                         Be less verbose
+  -V, --version                       Output version information an exit
+      --width <int>                   Set screen width, note that this is used
+                                      only as a guide line. Use
+                                      --disable-smart-width to make it strict.
+                                      (default 1024)
+
+Contact:
+  If you experience bugs or want to request new features please visit 
+  <http://code.google.com/p/wkhtmltopdf/issues/list>, if you have any problems
+  or comments please feel free to contact me: <uuf6429@gmail.com>
+
