@@ -2,6 +2,10 @@
 
 namespace WkHtmlToPdf\Behavior;
 
+/**
+ * @author Oleksandr Knyga <oleksandrknyga@gmail.com>
+ * @license http://www.opensource.org/licenses/MIT
+ */
 interface BehaviorInterface {
 	/**
 	 * @return string Content type header value

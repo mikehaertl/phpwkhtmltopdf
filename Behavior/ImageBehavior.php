@@ -1,10 +1,11 @@
 <?php
 
-// require_once('AbstractBehavior.php');
-// require_once('BehaviorInterface.php');
-
 namespace WkHtmlToPdf\Behavior;
 
+/**
+ * @author Oleksandr Knyga <oleksandrknyga@gmail.com>
+ * @license http://www.opensource.org/licenses/MIT
+ */
 class ImageBehavior extends AbstractBehavior implements BehaviorInterface {
 	public function getContentType() {
 		return "image/jpeg";

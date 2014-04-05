@@ -1,17 +1,14 @@
 <?php
 
-//require_once('BehaviorInterface.php');
-
 namespace WkHtmlToPdf\Behavior;
 
 /**
- * WkHtmlToPdf
+ * AbstractBehavior
  *
- * This class is a slim wrapper around wkhtmltopdf.
+ * This class is abstract behavior for slim wrapper around wkhtmltopdf
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
  * @author Oleksandr Knyga <oleksandrknyga@gmail.com>
- * @version 1.2.5-dev
  * @license http://www.opensource.org/licenses/MIT
  */
 abstract class AbstractBehavior
