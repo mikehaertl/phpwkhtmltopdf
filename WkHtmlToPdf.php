@@ -182,7 +182,7 @@ class WkHtmlToPdf
 
     /**
      * @param array $options list of options as name/value pairs
-     * 
+     *
      * @return array options processed
      */
     public function processOptions($options=array())
@@ -264,13 +264,13 @@ class WkHtmlToPdf
      */
     public function getCommand($filename)
     {
-        $command = $this->enableEscaping ? escapeshellarg($this->getBin()) : $this->getBin();
+        $command = $this->escape($this->getBin());
 
         $command .= $this->renderOptions($this->options);
 
         foreach($this->objects as $object)
         {
-            $command .= ' '.$object['input'];
+            $command .= ' '.$this->escape($object['input']);
             unset($object['input']);
             $command .= $this->renderOptions($object);
         }
