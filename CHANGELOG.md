@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.2.5
+
+ * Issue #46: Add 'ignoreWarnings' option
+ * Issue #41: Fix escaping of some parameters
+
 ## 1.2.4
 
  * Add support for HTML strings in html-footer and html-header

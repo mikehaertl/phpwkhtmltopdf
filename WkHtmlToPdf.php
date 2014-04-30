@@ -13,6 +13,7 @@ class WkHtmlToPdf
     protected $binPath;
     protected $binName = 'wkhtmltopdf';
 
+    protected $ignoreWarnings = false;
     protected $enableEscaping = true;
     protected $version9 = false;
 
@@ -33,15 +34,17 @@ class WkHtmlToPdf
     protected $xvfbRunOptions = ' --server-args="-screen 0, 1024x768x24" ';
 
     protected $error;
+    protected $warning;
 
     protected $localOptions = array(
         'binName',
         'binPath',
-        'tmp',
         'enableEscaping',
-        'version9',
-        'procEnv',
         'enableXvfb',
+        'ignoreWarnings',
+        'procEnv',
+        'tmp',
+        'version9',
         'xvfbRunBin',
         'xvfbRunOptions',
     );
@@ -323,8 +326,8 @@ class WkHtmlToPdf
             if ($result!==0) {
                 if (!file_exists($fileName) || filesize($fileName)===0) {
                     $this->error = "Could not run command $command:\n$stderr";
-                } else {
-                    $this->error = "Warning: an error occured while creating the PDF.\n$stderr";
+                } elseif (!$this->ignoreWarnings) {
+                    $this->error = "Warning: An error occured while creating the PDF:\n$stderr";
                 }
             }
         } else {

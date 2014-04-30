@@ -101,6 +101,7 @@ or be set via `setOptions()`:
  * `binPath`: Full path to the `wkhtmltopdf` shell command. Required on Windows systems and optionally autodetected if not set on other OS.
  * `binName`: Base name of the binary to use for autodetection. Default is `wkhtmltopdf`.
  * `tmp`: Path to tmp directory. Defaults to the PHP temp dir.
+ * `ignoreWarnings`: Whether to ignore any errors if a PDF file was still created. Default is false.
  * `enableEscaping`: Whether arguments to wkhtmltopdf should be escaped. Default is true.
  * `version9`: Whether to use command line syntax for wkhtmltopdf < 0.10.
  * `procEnv`: Optional array with environment variables for shell command.
@@ -121,7 +122,6 @@ if (!$pdf->send()) {
     throw new Exception('Could not create PDF: '.$pdf->getError());
 }
 ```
-
 
 ## Note for Windows users
 
