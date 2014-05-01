@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.6
+
+ * TBD
+
 ## 1.2.5
 
  * Issue #46: Add 'ignoreWarnings' option
