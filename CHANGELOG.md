@@ -3,6 +3,7 @@
 ## 1.2.5
 
  * Issue #46: Add 'ignoreWarnings' option
+ * Issue #45: Fix for missing sys_get_temp_dir() on older PHP 5 versions
  * Issue #41: Fix escaping of some parameters
 
 ## 1.2.4

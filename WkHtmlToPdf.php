@@ -255,7 +255,13 @@ class WkHtmlToPdf
     public function getTmpDir()
     {
         if ($this->tmp===null) {
-            $this->tmp = sys_get_temp_dir();
+            if (function_exists('sys_get_temp_dir')) {
+                $this->tmp = sys_get_temp_dir();
+            } elseif ( ($tmp = getenv('TMP')) || ($tmp = getenv('TEMP')) || ($tmp = getenv('TMPDIR')) ) {
+                $this->tmp = realpath($tmp);
+            } else {
+                $this->tmp = '/tmp';
+            }
         }
 
         return $this->tmp;
