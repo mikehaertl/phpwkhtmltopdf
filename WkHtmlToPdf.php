@@ -284,7 +284,7 @@ class WkHtmlToPdf
             $command .= $this->renderOptions($object);
         }
 
-        return $command.' '.$filename;
+        return $command.' '.$this->escape($filename);
     }
 
     /**
