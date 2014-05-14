@@ -391,7 +391,11 @@ class WkHtmlToPdf
      */
     protected function escape($val)
     {
-        return $this->enableEscaping ? escapeshellarg($val) : $val;
+        $val=(string)$val;
+        if($this->enableEscaping){
+            return (''==$val) ? "''" : escapeshellarg($val);
+        }
+        return $val;
     }
 
     /**
