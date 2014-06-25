@@ -207,7 +207,7 @@ class WkHtmlToPdf
     {
         if ($this->binPath===null) {
             if ($this->getIsWindows()) {
-                return '';
+                $this->binPath = trim(shell_exec('where '.$this->binName));
             } else {
                 $this->binPath = trim(shell_exec('which '.$this->binName));
             }
