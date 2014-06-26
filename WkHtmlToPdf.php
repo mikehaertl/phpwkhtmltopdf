@@ -205,12 +205,41 @@ class WkHtmlToPdf
      */
     public function getBin()
     {
-        if ($this->binPath===null) {
-            if ($this->getIsWindows()) {
-                $this->binPath = trim(shell_exec('where '.$this->binName));
-            } else {
-                $this->binPath = trim(shell_exec('which '.$this->binName));
+        if ($this->binPath === null) {
+
+            // defaults to binName
+            $binPath = $this->binName;
+
+            // Command used for location
+            $cmd = ($this->getIsWindows()) ? 'where' : 'which';
+
+            // Proc open descriptors
+            $spec = array(
+                1 => array('pipe', 'w'),
+                2 => array('pipe', 'w')
+            );
+            $pipes = array();
+            $process = proc_open("$cmd {$this->binName}", $spec, $pipes);
+
+            //Process was successfully opened
+            if (is_resource($process)) {
+                $location = stream_get_contents($pipes[1]);
+                $error = stream_get_contents($pipes[2]);
+                fclose($pipes[1]);
+                fclose($pipes[2]);
+
+                //Parse $location
+                if ($error == null && $location != null) {
+                    $location = explode(PHP_EOL, $location);
+                    $binPath = trim($location[0]);
+                }
+                if ($error) {
+                    $this->error = $error;
+                }
+
+                proc_close($process);
             }
+            $this->binPath = $binPath;
         }
         return $this->binPath;
     }
