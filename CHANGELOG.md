@@ -2,7 +2,8 @@
 
 ## 1.2.6
 
- * TBD
+ * Issue #54: Add binary autodetection for windows
+ * Issue #47: Add escaping to temp files to improve behavior on windows
 
 ## 1.2.5
 
