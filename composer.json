@@ -12,10 +12,13 @@
         }
     ],
     "require": {
-        "php": ">=5.0.0"
+        "php": ">=5.0.0",
+        "mikehaertl/php-shellcommand": "1.*"
     },
     "autoload": {
-        "classmap": ["WkHtmlToPdf.php"]
+        "psr-4": {
+            "mikehaertl\\wkhtmlto\\": "src/"
+        }
     },
     "suggest": {
         "h4cc/wkhtmltopdf-i386": "wkhtmltopdf static linked linux binary for i386 systems.",

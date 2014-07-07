@@ -1,14 +1,16 @@
 <?php
+namespace mikehaertl\wkhtmlto;
+
 /**
- * WkHtmlToPdf
+ * Pdf
  *
  * This class is a slim wrapper around wkhtmltopdf.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @version 1.2.6-dev
+ * @version 2.0.0-dev
  * @license http://www.opensource.org/licenses/MIT
  */
-class WkHtmlToPdf
+class Pdf
 {
     protected $binPath;
     protected $binName = 'wkhtmltopdf';
