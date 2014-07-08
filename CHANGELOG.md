@@ -1,8 +1,15 @@
 # CHANGELOG
 
+## 2.0.0
+
+In this major release we have added a wrapper for wkhtmltopdf and cleaned
+up the code and interface. We also introduced namespaces and Travis testing.
+Please have a look at the README.md for the new API.
+
 ## 1.2.6
 
- * TBD
+ * Issue #54: Add binary autodetection for windows
+ * Issue #47: Add escaping to temp files to improve behavior on windows
 
 ## 1.2.5
 

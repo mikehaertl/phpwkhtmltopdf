@@ -16,8 +16,7 @@ Install the package through [composer](http://getcomposer.org).
 ### Single page PDF
 
 ```php
-<?php
-use mikehaertl/wkhtmlto/Pdf;
+use mikehaertl\wkhtmlto\Pdf;
 
 // You can pass a filename, a HTML string or an URL to the constructor
 $pdf = new Pdf('/home/joe/page.html');
@@ -50,6 +49,21 @@ $pdf->send();
 $pdf->send('test.pdf');
 ```
 
+### Creating an image
+
+```php
+use mikehaertl\wkhtmlto\Image;
+
+// You can pass a filename, a HTML string or an URL to the constructor
+$image = new Image('/home/joe/page.html');
+$image->saveAs('/tmp/new.png');
+
+// ... or send to client for inline display
+$image->send();
+
+// ... or send to client as file download
+$image->send('test.png');
+```
 
 ## Setting options
 
@@ -83,10 +97,10 @@ $options = array(
 );
 ```
 
-Options can be passed to several methods.
+Options can be passed to several methods for PDFs:
 
 ```php
-$pdf = new WkHtmlToPdf($globalOptions); // Set global PDF options
+$pdf = new Pdf($globalOptions);         // Set global PDF options
 $pdf->setOptions($globalOptions);       // Set global PDF options (alternative)
 $pdf->addPage($page, $pageOptions);     // Add page with options
 $pdf->addCover($page, $pageOptions);    // Add cover with options
@@ -96,7 +110,14 @@ $pdf->addToc($tocOptions);              // Add TOC with options
 > Note, that you can also use page options in the global PDF options. `wkhtmltopdf`
 > will apply them to all pages unless you override them when you add a page.
 
-## Special global options
+For `wkhtmltoimage` there's only one set of options:
+
+```php
+$image = new Image($options);   // Set image options
+$image->setOptions($options);   // Set image options (alternative)
+```
+
+### Special global options
 
 There are some special options to configure the wrapper itself. They can be passed to the constructor
 or set via `setOptions()`:
@@ -108,6 +129,10 @@ or set via `setOptions()`:
  * `ignoreWarnings`: Whether to ignore any errors if a PDF file was still created. Default is false.
  * `version9`: Whether to use command line syntax for older wkhtmltopdf versions.
 
+In addition to the `binary`, `commandOptions`, `tmpDir` and `ignorWarnings` options above,
+the `Image` class also has a `type` option:
+
+ * `type`: The image type. Default is `png`. You can also use `jpg` or `bmp`.
 
 ## Error handling
 
@@ -115,7 +140,6 @@ or set via `setOptions()`:
 available from `getError()`:
 
 ```php
-<?php
 if (!$pdf->send()) {
     throw new Exception('Could not create PDF: '.$pdf->getError());
 }
@@ -127,8 +151,7 @@ If you use double quotes (`"`) or percent signs (`%`) as option values, they may
 In this case you can disable argument escaping in the `Command`:
 
 ```php
-<?php
-$pdf = new WkHtmlToPdf(array(
+$pdf = new Pdf(array(
     'commandOptions' => array(
         'escapeArgs' => false,
     ),
@@ -162,8 +185,7 @@ your architecture from [https://code.google.com/p/wkhtmltopdf/](https://code.goo
 In both cases you have to tell the PHP class where to find the binary.
 
 ```php
-<?php
-$pdf = new WkHtmlToPdf(array(
+$pdf = new Pdf(array(
     'binary' => '/path/to/your/wkhtmltopdf',
     ...
 ));
@@ -189,8 +211,7 @@ which will create quite some extra load on your CPU. So this setup is only recom
 To use the built in support you have to set `enableXvfb` in the `commandOptions`. There are also some options you can set.
 
 ```php
-<?php
-$pdf = new WkHtmlToPdf(array(
+$pdf = new Pdf(array(
     // Explicitly tell wkhtmltopdf that we're using an X environment
     'use-xserver',
 
@@ -219,8 +240,7 @@ If your `Xvfb` process is running, you just have to tell the class to use this X
 rendering. This is done via an environment variable.
 
 ```php
-<?php
-$pdf = new WkHtmlToPdf(array(
+$pdf = new Pdf(array(
     'use-xserver',
     'commandOptions' => array(
         // You can change ':0' to whatever display you pick in your daemon script
@@ -236,9 +256,10 @@ But then I had scaling issues which went away after I set all margins to zero an
 added the margins through CSS. You can also use `cm` or `in` in CSS as this is more apropriate for print styles.
 
 ```php
-<?php
-// Create a new WKHtmlToPdf object with some global PDF options
-$pdf = new WkHtmlToPdf(array(
+use mikehaertl\wkhtmlto\Pdf;
+
+// Create a new Pdf object with some global PDF options
+$pdf = new Pdf(array(
     'no-outline',         // Make Chrome not complain
     'margin-top'    => 0,
     'margin-right'  => 0,
