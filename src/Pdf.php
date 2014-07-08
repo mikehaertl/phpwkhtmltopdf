@@ -1,8 +1,6 @@
 <?php
 namespace mikehaertl\wkhtmlto;
 
-use mikehaertl\shellcommand\Command;
-
 /**
  * Pdf
  *
@@ -24,7 +22,7 @@ class Pdf
     public $binary = 'wkhtmltopdf';
 
     /**
-     * @var array options to pass to the mikehaertl/shellcommand/Command constructor. Default is none.
+     * @var array options to pass to the Command constructor. Default is none.
      */
     public $commandOptions = array();
 
@@ -70,7 +68,7 @@ class Pdf
     protected $_tmpFiles = array();
 
     /**
-     * @var mikehaertl\shellcommand\Command the command instance that executes wkhtmltopdf
+     * @var Command the command instance that executes wkhtmltopdf
      */
     protected $_command;
 
@@ -236,9 +234,9 @@ class Pdf
         $command = $this->getCommand();
         $fileName = $this->getPdfFilename();
 
-        $this->addCommandArgs($command, $this->_options);
+        $command->addArgs($this->_options);
         foreach ($this->_objects as $object) {
-            $this->addCommandArgs($command, $object);
+            $command->addArgs($object);
         }
         $command->addArg($fileName);
         if (!$command->execute()) {
@@ -249,35 +247,6 @@ class Pdf
         }
         $this->_isCreated = true;
         return true;
-    }
-
-    /**
-     * Add args to the Command from a given options array
-     *
-     * @param mikehaertl\shellcommand\Command $command the command to add the args to
-     * @param array $args the args to add
-     */
-    protected function addCommandArgs($command, $args)
-    {
-        if (isset($args['input'])) {
-            $command->addArg((string) $args['input']);    // Typecasts TmpFile to filename
-            unset($args['input']);
-        }
-        foreach($args as $key=>$val) {
-            if (is_numeric($key)) {
-                $command->addArg("--$val");
-            } elseif (is_array($val)) {
-                foreach($val as $vkey => $vval) {
-                    if (is_int($vkey)) {
-                        $command->addArg("--$key", $vval);
-                    } else {
-                        $command->addArg("--$key", array($vkey, $vval));
-                    }
-                }
-            } else {
-                $command->addArg("--$key", $val);
-            }
-        }
     }
 
     /**

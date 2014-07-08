@@ -102,10 +102,11 @@ There are some special options to configure the wrapper itself. They can be pass
 or set via `setOptions()`:
 
  * `binary`: Path or filename of the `wkhtmltopdf` shell command. Default is `wkhtmltopdf`.
- * `commandOptions`: Options to pass to `mikehaertl\shellcommand\Command`. See [php-shellcommand](https://github.com/mikehaertl/php-shellcommand).
+ * `commandOptions`: Options to pass to `mikehaertl\shellcommand\Command`.
+    See [php-shellcommand](https://github.com/mikehaertl/php-shellcommand).
  * `tmpDir`: Path to tmp directory. Defaults to the PHP temp dir.
  * `ignoreWarnings`: Whether to ignore any errors if a PDF file was still created. Default is false.
- * `version9`: Whether to use command line syntax for wkhtmltopdf < 0.10.
+ * `version9`: Whether to use command line syntax for older wkhtmltopdf versions.
 
 
 ## Error handling
@@ -120,16 +121,26 @@ if (!$pdf->send()) {
 }
 ```
 
-# OUTDATED SINCE 2.0
-
 ## Note for Windows users
 
 If you use double quotes (`"`) or percent signs (`%`) as option values, they may get converted to spaces.
-You can set `enableEscaping` to false in this case. But then you have to take care of proper escaping yourself.
-In some cases it may be neccessary to surround your argument values with extra double quotes.
+In this case you can disable argument escaping in the `Command`:
+
+```php
+<?php
+$pdf = new WkHtmlToPdf(array(
+    'commandOptions' => array(
+        'escapeArgs' => false,
+    ),
+    ...
+));
+```
+
+But then you have to take care of proper argument escaping yourself. In some cases it may be neccessary to
+surround your argument values with extra double quotes.
 
 I also found that some options don't work on Windows (tested with wkhtmltopdf 0.11 rc2), like the
-`user-style-sheet` option described below.
+`user-style-sheet` option used in the example below.
 
 
 ## Setup for different wkhtmltopdf versions
@@ -137,29 +148,26 @@ I also found that some options don't work on Windows (tested with wkhtmltopdf 0.
 As mentioned before the PHP class is just a convenient frontend for the `wkhtmltopdf` command. So you need to
 install this command on your system before you can use the class. On Linux there are two flavours:
 
- *  Statically linked: You install a statically linked version via compose or download it from their
+ *  Statically linked: You install a statically linked version via composer or download it from their
     homepage. It's self-contained and thus the recommended way to use the class on most webservers.
  *  Dynamically linked: This is what you get for example on Ubuntu if you install the wkhtmltopdf package.
-    It will work, but requires an X server which is usually not available on headless webservers. We provide
-    two Xvfb based workarounds below.
+    It will work, but requires an X server which is usually not available on headless webservers.
+    We therefore provide two Xvfb based workarounds below.
 
 ### Statically linked binary
 
-You can use `composer` to install the binaries from `h4cc/wkhtmltopdf-i386` or `h4cc/wkhtmltopdf-amd64`.
-Or you can manually download and unzip the correct package for your architecture from
-[https://code.google.com/p/wkhtmltopdf/](https://code.google.com/p/wkhtmltopdf/).
+You can use `composer` to install the binaries from `h4cc/wkhtmltopdf-i386` or `h4cc/wkhtmltopdf-amd64`
+and also the `wkhtmltoimage` counterparts. Or you can manually download and unzip the correct package for
+your architecture from [https://code.google.com/p/wkhtmltopdf/](https://code.google.com/p/wkhtmltopdf/).
 In both cases you have to tell the PHP class where to find the binary.
 
 ```php
 <?php
 $pdf = new WkHtmlToPdf(array(
-    'binPath' => '/path/to/your/wkhtmltopdf',
+    'binary' => '/path/to/your/wkhtmltopdf',
     ...
 ));
 ```
-
-If you put the class somewhere in your `$PATH` directories it should even get autodetected. You may
-have to set the correct name of the binary, though (e.g. `'binName' => 'wkhtmltopdf-amd64',`).
 
 ### Dynamically linked binary with Xvfb
 
@@ -178,7 +186,7 @@ This wraps each call to `wkhtmltopdf` with [xvfb-run](http://manpages.ubuntu.com
 The drawback with this solution is, that there's still a new session fired up for each an every PDF you create,
 which will create quite some extra load on your CPU. So this setup is only recommended for low frequency sites.
 
-To enable the built in support you have to set `enableXvfb`. There are also some options you can set.
+To use the built in support you have to set `enableXvfb` in the `commandOptions`. There are also some options you can set.
 
 ```php
 <?php
@@ -186,15 +194,15 @@ $pdf = new WkHtmlToPdf(array(
     // Explicitly tell wkhtmltopdf that we're using an X environment
     'use-xserver',
 
-    // Enable built in Xvfb support
-    'enableXvfb' => true,
+    // Enable built in Xvfb support in the command
+    'commandOptions' => array(
+        'enableXvfb' => true,
 
-    // If this is not set, the xvfb-run binary is autodected
-    'xvfbRunBin' => '/usr/bin/xvfb-run',
+        // Optional: Set your path to xvfb-run. Default is just 'xvfb-run'.
+        // 'xvfbRunBin' => '/usr/bin/xvfb-run',
 
-    // By default the following options are passed to xvfb-run.
-    // So only use this option if you want/have to change them.
-    'xvfbRunOptions' =>  ' --server-args="-screen 0, 1024x768x24" ',
+        // Optional: Set options for xfvb-run. The following defaults are used.
+        // 'xvfbRunOptions' =>  '--server-args="-screen 0, 1024x768x24"',
 ));
 ```
 
@@ -214,7 +222,10 @@ rendering. This is done via an environment variable.
 <?php
 $pdf = new WkHtmlToPdf(array(
     'use-xserver',
-    'procEnv' => array( 'DISPLAY' => ':0' ),  //You can change ':0' to whatever display you pick in your daemon script
+    'commandOptions' => array(
+        // You can change ':0' to whatever display you pick in your daemon script
+        'procEnv' => array( 'DISPLAY' => ':0' ),
+    ),
 ));
 ```
 

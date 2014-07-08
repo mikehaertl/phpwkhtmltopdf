@@ -3,7 +3,12 @@ php:
   - "5.5"
   - "5.4"
   - "5.3"
+before_install:
+  - sudo apt-get update
 install:
+  - sudo apt-get install xvfb
   - composer install
-  - composer require h4cc/wkhtmltopdf-i386:0.12.1
-  - composer require h4cc/wkhtmltoimage-i386:0.12.1
+  - composer require h4cc/wkhtmltopdf-amd64:0.12.1
+  - composer require h4cc/wkhtmltoimage-amd64:0.12.1
+  - ln -s ./wkhtmltopdf-amd64 vendor/bin/wkhtmltopdf
+  - ln -s ./wkhtmltoimage-amd64 vendor/bin/wkhtmltoimage

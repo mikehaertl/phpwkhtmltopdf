@@ -272,10 +272,34 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         unlink($outFile);
     }
 
+    // Xvfb
+    public function testCanUseXvfbRun()
+    {
+        $inFile = $this->getHtmlAsset();
+        $outFile = $this->getOutFile();
+        $binary = $this->getBinary();
+
+        $pdf = new Pdf(array(
+            'binary' => $binary,
+            'commandOptions' => array(
+                'enableXvfb' => true,
+            ),
+        ));
+
+        $this->assertInstanceOf('mikehaertl\wkhtmlto\Pdf', $pdf->addPage($inFile));
+        $this->assertTrue($pdf->saveAs($outFile));
+
+        $tmpFile = $pdf->getPdfFilename();
+        $command = (string)$pdf->getCommand();
+        $this->assertEquals("xvfb-run --server-args=\"-screen 0, 1024x768x24\" $binary $inFile $tmpFile", $command);
+        unlink($outFile);
+    }
+
+
 
     protected function getBinary()
     {
-        return realpath(__DIR__.'/../vendor/bin/wkhtmltopdf-i386');
+        return realpath(__DIR__.'/../vendor/bin/wkhtmltopdf');
     }
 
     protected function getHtmlAsset()
