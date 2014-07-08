@@ -17,7 +17,7 @@ Install the package through [composer](http://getcomposer.org).
 
 ```php
 <?php
-use mikehaertl/wkhtmlto/Pdf;
+use mikehaertl\wkhtmlto\Pdf;
 
 // You can pass a filename, a HTML string or an URL to the constructor
 $pdf = new Pdf('/home/joe/page.html');
