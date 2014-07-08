@@ -1,7 +1,9 @@
 PHP WkHtmlToPdf
 ===============
 
-PHP WkHtmlToPdf provides a simple and clean interface to ease PDF creation with
+[![Build Status](https://secure.travis-ci.org/mikehaertl/phpwkhtmltopdf.png)](http://travis-ci.org/mikehaertl/phpwkhtmltopdf)
+
+PHP WkHtmlToPdf provides a simple and clean interface to ease PDF and image creation with
 [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/).
 
 **The [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/) command must be installed and working on your system.**
@@ -9,13 +11,25 @@ See the section below for details.
 
 ## Quickstart
 
+Install the package through [composer](http://getcomposer.org).
+
+### Single page PDF
+
 ```php
 <?php
-require_once('WkHtmlToPdf.php');
+use mikehaertl/wkhtmlto/Pdf;
 
-$pdf = new WkHtmlToPdf;
+// You can pass a filename, a HTML string or an URL to the constructor
+$pdf = new Pdf('/home/joe/page.html');
+$pdf->saveAs('/tmp/new.pdf');
+```
 
-// Add a HTML file, a HTML string or a page from a URL
+### Multi page PDF with Toc and Cover page
+
+
+```php
+<?php
+$pdf = new Pdf;
 $pdf->addPage('/home/joe/page.html');
 $pdf->addPage('<html>....</html>');
 $pdf->addPage('http://google.com');
@@ -41,80 +55,63 @@ $pdf->send('test.pdf');
 
 The `wkhtmltopdf` shell command accepts different types of options:
 
- * global options (e.g. to set the document's DPI)
+ * global options (e.g. to set the document's DPI or the default page options)
  * page options (e.g. to supply a custom CSS file for a page)
  * toc options (e.g. to set a TOC header)
 
 Please see `wkhtmltopdf -H` for a full explanation. All options are passed as array, for example:
 
 ```php
-// Global PDF options
 $options = array(
     'no-outline',           // option without argument
     'encoding' => 'UTF-8',  // option with argument
-);
-$pdf = new WkHtmlToPdf($options);
-```
 
-Page options can be supplied on each call to `addPage()`. But you can also set default
-options that will be applied to all pages:
+    // Option with 2 arguments
+    'cookie' => array('name'=>'value'),
 
-```php
-$pdf = new WkHtmlToPdf($globalOptions); // Set global PDF options
-$pdf->setOptions($globalOptions);       // Set global PDF options (alternative)
-$pdf->setPageOptions($pageOptions);     // Set default page options
-$pdf->addPage($page, $pageOptions);     // Add page with options (overrides default page options)
-$pdf->addCover($page, $pageOptions);    // Add cover with options (overrides default page options)
-```
-
-Toc options can be passed to `addToc()`:
-
-```php
-$pdf->addToc($tocOptions);              // Add TOC with options
-```
-
-Since 1.2.2 you can also pass repeatable options like `cookie` or `run-script`:
-
-```php
-$pdf->addPage($page, array(
-    // Repeatable options with <name> <value> arguments
-    'cookie' => array(
-        'PHPSESSID' => $session_id,
-        'marketing_flag' => 1,
-    ),
     // Repeatable options with single argument
     'run-script' => array(
         'local1.js',
         'local2.js',
     ),
-));
+
+    // Repeatable options with 2 arguments
+    'replace' => array(
+        '{page}' => $page++,
+        '{title}' => $pageTitle,
+    ),
+);
 ```
 
-And since 1.2.4 you can also supply a custom HTML string as `header-html` and
-`footer-html`. The string must contain at least one HTML tag, though.
+Options can be passed to several methods.
+
+```php
+$pdf = new WkHtmlToPdf($globalOptions); // Set global PDF options
+$pdf->setOptions($globalOptions);       // Set global PDF options (alternative)
+$pdf->addPage($page, $pageOptions);     // Add page with options
+$pdf->addCover($page, $pageOptions);    // Add cover with options
+$pdf->addToc($tocOptions);              // Add TOC with options
+```
+
+> Note, that you can also use page options in the global PDF options. `wkhtmltopdf`
+> will apply them to all pages unless you override them when you add a page.
 
 ## Special global options
 
-There are some special options to configure PHP wrapper. They can be passed to the constructor
-or be set via `setOptions()`:
+There are some special options to configure the wrapper itself. They can be passed to the constructor
+or set via `setOptions()`:
 
- * `binPath`: Full path to the `wkhtmltopdf` shell command. Required on Windows systems and optionally autodetected if not set on other OS.
- * `binName`: Base name of the binary to use for autodetection. Default is `wkhtmltopdf`.
- * `tmp`: Path to tmp directory. Defaults to the PHP temp dir.
+ * `binary`: Path or filename of the `wkhtmltopdf` shell command. Default is `wkhtmltopdf`.
+ * `commandOptions`: Options to pass to `mikehaertl\shellcommand\Command`. See [php-shellcommand](https://github.com/mikehaertl/php-shellcommand).
+ * `tmpDir`: Path to tmp directory. Defaults to the PHP temp dir.
  * `ignoreWarnings`: Whether to ignore any errors if a PDF file was still created. Default is false.
- * `enableEscaping`: Whether arguments to wkhtmltopdf should be escaped. Default is true.
  * `version9`: Whether to use command line syntax for wkhtmltopdf < 0.10.
- * `procEnv`: Optional array with environment variables for shell command.
- * `enableXvfb`: Whether to use the built in Xvfb support (see below). Default is false.
- * `xvfbRunBin`: Path to `xvfb-run` binary (see below). Default is to autodetect the binary.
- * `xvfbRunOptions`: Options for the `xvfb-run` command (see below). Default is
-   ` --server-args="-screen 0, 1024x768x24" `.
 
 
 ## Error handling
 
-`send()`, `saveAs()` and `save()` will return false on error. In this case the detailed error message from
-`wkhtmltopdf` is available from `getError()`:
+`send()` and `saveAs()` will return `false` on error. In this case the detailed error message is
+available from `getError()`:
 
 ```php
 <?php
@@ -122,6 +119,8 @@ if (!$pdf->send()) {
     throw new Exception('Could not create PDF: '.$pdf->getError());
 }
 ```
+
+# OUTDATED SINCE 2.0
 
 ## Note for Windows users
 
@@ -214,7 +213,7 @@ rendering. This is done via an environment variable.
 ```php
 <?php
 $pdf = new WkHtmlToPdf(array(
-    'use-xserver',                                              
+    'use-xserver',
     'procEnv' => array( 'DISPLAY' => ':0' ),  //You can change ':0' to whatever display you pick in your daemon script
 ));
 ```
@@ -234,10 +233,8 @@ $pdf = new WkHtmlToPdf(array(
     'margin-right'  => 0,
     'margin-bottom' => 0,
     'margin-left'   => 0,
-));
 
-// Set default page options for all following pages
-$pdf->setPageOptions(array(
+    // Default page options
     'disable-smart-shrinking',
     'user-style-sheet' => 'pdf.css',
 ));

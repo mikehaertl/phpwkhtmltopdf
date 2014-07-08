@@ -1,6 +1,8 @@
 <?php
 namespace mikehaertl\wkhtmlto;
 
+use mikehaertl\shellcommand\Command;
+
 /**
  * Pdf
  *
@@ -12,69 +14,80 @@ namespace mikehaertl\wkhtmlto;
  */
 class Pdf
 {
-    protected $binPath;
-    protected $binName = 'wkhtmltopdf';
-
-    protected $ignoreWarnings = false;
-    protected $enableEscaping = true;
-    protected $version9 = false;
-
-    protected $options = array();
-    protected $pageOptions = array();
-    protected $objects = array();
-
-    protected $tmp;
-    protected $tmpFile;
-    protected $tmpFiles = array();
-
-    protected $procEnv;
-
-    protected $isWindows;
-
-    protected $enableXvfb = false;
-    protected $xvfbRunBin;
-    protected $xvfbRunOptions = ' --server-args="-screen 0, 1024x768x24" ';
-
-    protected $error;
-    protected $warning;
-
-    protected $localOptions = array(
-        'binName',
-        'binPath',
-        'enableEscaping',
-        'enableXvfb',
-        'ignoreWarnings',
-        'procEnv',
-        'tmp',
-        'version9',
-        'xvfbRunBin',
-        'xvfbRunOptions',
-    );
-
     // Regular expression to detect HTML strings
     const REGEX_HTML = '/<html/i';
 
     /**
-     * @param array $options global options for wkhtmltopdf (optional)
+     * @var string the name of the `wkhtmltopdf` binary. Default is `wkhtmltopdf`. You can also
+     * configure a full path here.
      */
-    public function __construct($options=array())
-    {
-        if ($options!==array()) {
-            $this->setOptions($options);
-        }
-    }
+    public $binary = 'wkhtmltopdf';
 
     /**
-     * Remove temporary PDF file and pages when script completes
+     * @var array options to pass to the mikehaertl/shellcommand/Command constructor. Default is none.
      */
-    public function __destruct()
-    {
-        if ($this->tmpFile!==null) {
-            unlink($this->tmpFile);
-        }
+    public $commandOptions = array();
 
-        foreach($this->tmpFiles as $tmp) {
-            unlink($tmp);
+    /**
+     * @var string|null the directory to use for temporary files. If null (default) the dir is autodetected.
+     */
+    public $tmpDir;
+
+    /**
+     * @var bool whether to ignore any errors if some PDF file was still created. Default is false.
+     */
+    public $ignoreWarnings = false;
+
+    /**
+     * @var bool whether the old version 9 of wkhtmltopdf is used (slightly different syntax). Default is false.
+     */
+    public $version9 = false;
+
+    /**
+     * @var bool whether the PDF was created
+     */
+    protected $_isCreated = false;
+
+    /**
+     * @var array global options for wkhtmltopdf as array('--opt1', '--opt2'=>'val', ...)
+     */
+    protected $_options = array();
+
+    /**
+     * @var array list of wkhtmltopdf objects as arrays
+     */
+    protected $_objects = array();
+
+    /**
+     * @var TmpFile the temporary PDF file
+     */
+    protected $_tmpPdfFile;
+
+    /**
+     * @var array list of TmpFile objects. This is here to keep a reference to TmpFile and thus avoid
+     * too early call of TmpFile::__destruct() if the file is not referenced anymore.
+     */
+    protected $_tmpFiles = array();
+
+    /**
+     * @var mikehaertl\shellcommand\Command the command instance that executes wkhtmltopdf
+     */
+    protected $_command;
+
+    /**
+     * @var string the detailed error message. Empty string if none.
+     */
+    protected $_error = '';
+
+    /**
+     * @param array|string $options global options for wkhtmltopdf or page URL, HTML or PDF/HTML filename
+     */
+    public function __construct($options=null)
+    {
+        if (is_array($options)) {
+            $this->setOptions($options);
+        } elseif (is_string($options)) {
+            $this->addPage($options);
         }
     }
 
@@ -83,34 +96,41 @@ class Pdf
      *
      * @param string $input either a URL, a HTML string or a PDF/HTML filename
      * @param array $options optional options for this page
+     * @return Pdf the Pdf instance for method chaining
      */
     public function addPage($input,$options=array())
     {
-        $options['input'] = preg_match(self::REGEX_HTML, $input) ? $this->createTmpFile($input) : $input;
-        $this->objects[] = array_merge($this->pageOptions,$this->processOptions($options));
+        $options = $this->processOptions($options);
+        $options['input'] = $this->processInput($input);
+        $this->_objects[] = $options;
+        return $this;
     }
 
     /**
      * Add a cover page object to the output
      *
-     * @param string $input either a URL or a PDF filename
-     * @param array $options optional options for this page
+     * @param string $input either a URL, a HTML string or a PDF/HTML filename
+     * @param array $options optional options for the cover page
+     * @return Pdf the Pdf instance for method chaining
      */
     public function addCover($input,$options=array())
     {
-        $options['input'] = ($this->version9 ? '--' : '')."cover $input";
-        $this->objects[] = array_merge($this->pageOptions,$options);
+        $options['input'] = ($this->version9 ? '--' : '').'cover '.$this->processInput($input);
+        $this->_objects[] = $options;
+        return $this;
     }
 
     /**
      * Add a TOC object to the output
      *
      * @param array $options optional options for the table of contents
+     * @return Pdf the Pdf instance for method chaining
      */
     public function addToc($options=array())
     {
         $options['input'] = ($this->version9 ? '--' : '')."toc";
-        $this->objects[] = $options;
+        $this->_objects[] = $options;
+        return $this;
     }
 
     /**
@@ -121,294 +141,170 @@ class Pdf
      */
     public function saveAs($filename)
     {
-        if (($pdfFile = $this->getPdfFilename())===false) {
+        if (!$this->_isCreated && !$this->createPdf()) {
             return false;
         }
-
-        copy($pdfFile,$filename);
+        $tmpFile = $this->getPdfFilename();
+        if (!copy($tmpFile,$filename)) {
+            $this->_error = "Could not copy PDF from tmp location '$tmpFile' to '$filename'";
+            return false;
+        }
         return true;
     }
 
     /**
      * Send PDF to client, either inline or as download (triggers PDF creation)
      *
-     * @param mixed $filename the filename to send. If empty, the PDF is streamed inline.
+     * @param string|null $filename the filename to send. If empty, the PDF is streamed inline.
      * @param bool $inline whether to force inline display of the PDF, even if filename is present.
      * @return bool whether PDF was created successfully
      */
     public function send($filename=null,$inline=false)
     {
-        if (($pdfFile = $this->getPdfFilename())===false) {
+        if (!$this->_isCreated && !$this->createPdf()) {
             return false;
         }
-
-        header('Pragma: public');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Content-Type: application/pdf');
-        header('Content-Transfer-Encoding: binary');
-        header('Content-Length: '.filesize($pdfFile));
-
-        if ($filename!==null || $inline) {
-            $disposition = $inline ? 'inline' : 'attachment';
-            header("Content-Disposition: $disposition; filename=\"$filename\"");
-        }
-
-        readfile($pdfFile);
+        $this->_tmpPdfFile->send($filename, 'application/pdf', $inline);
         return true;
     }
 
     /**
      * Set global option(s)
      *
-     * @param array $options list of global options to set as name/value pairs
+     * @param array $options list of global PDF options to set as name/value pairs
+     * @return Pdf the Pdf instance for method chaining
      */
     public function setOptions($options=array())
     {
         $options = $this->processOptions($options);
         foreach ($options as $key=>$val) {
-            if(in_array($key, $this->localOptions, true)) {
+            if (is_int($key)) {
+                $this->_options[] = $val;
+            } elseif ($key[0]!=='_' && property_exists($this, $key)) {
                 $this->$key = $val;
-            } elseif (is_int($key)) {
-                $this->options[] = $val;
             } else {
-                $this->options[$key] = $val;
+                $this->_options[$key] = $val;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return mikehaertl\shellcommand\Command the command instance that executes wkhtmltopdf
+     */
+    public function getCommand()
+    {
+        if ($this->_command===null) {
+            $options = $this->commandOptions;
+            if (!isset($options['command'])) {
+                $options['command'] = $this->binary;
+            }
+            $this->_command = new Command($options);
+        }
+        return $this->_command;
+    }
+
+    /**
+     * @return string the detailed error message. Empty string if none.
+     */
+    public function getError()
+    {
+        return $this->_error;
+    }
+
+    /**
+     * @return string the filename of the temporary PDF file
+     */
+    public function getPdfFilename()
+    {
+        if ($this->_tmpPdfFile===null) {
+            $this->_tmpPdfFile = new TmpFile('', '.pdf');
+        }
+        return $this->_tmpPdfFile->getFileName();
+    }
+
+    /**
+     * Run the Command to create the tmp PDF file
+     *
+     * @return bool whether creation was successful
+     */
+    protected function createPdf()
+    {
+        if ($this->_isCreated) {
+            return false;
+        }
+        $command = $this->getCommand();
+        $fileName = $this->getPdfFilename();
+
+        $this->addCommandArgs($command, $this->_options);
+        foreach ($this->_objects as $object) {
+            $this->addCommandArgs($command, $object);
+        }
+        $command->addArg($fileName);
+        if (!$command->execute()) {
+            $this->_error = $command->getError();
+            if (!(file_exists($fileName) && filesize($fileName)!==0 && $this->ignoreWarnings)) {
+                return false;
+            }
+        }
+        $this->_isCreated = true;
+        return true;
+    }
+
+    /**
+     * Add args to the Command from a given options array
+     *
+     * @param mikehaertl\shellcommand\Command $command the command to add the args to
+     * @param array $args the args to add
+     */
+    protected function addCommandArgs($command, $args)
+    {
+        if (isset($args['input'])) {
+            $command->addArg((string) $args['input']);    // Typecasts TmpFile to filename
+            unset($args['input']);
+        }
+        foreach($args as $key=>$val) {
+            if (is_numeric($key)) {
+                $command->addArg("--$val");
+            } elseif (is_array($val)) {
+                foreach($val as $vkey => $vval) {
+                    if (is_int($vkey)) {
+                        $command->addArg("--$key", $vval);
+                    } else {
+                        $command->addArg("--$key", array($vkey, $vval));
+                    }
+                }
+            } else {
+                $command->addArg("--$key", $val);
             }
         }
     }
 
     /**
-     * @param array $options that should be applied to all pages as name/value pairs
+     * @param string $input
+     * @return TmpFile|string a TmpFile if the input is a html string. The unchanged input otherwhise.
      */
-    public function setPageOptions($options=array())
+    protected function processInput($input)
     {
-        $this->pageOptions = $this->processOptions($options);
+        if (preg_match(self::REGEX_HTML, $input)) {
+            return $this->_tmpFiles[] = new TmpFile($input, '.html');
+        } else {
+            return $input;
+        }
     }
 
     /**
      * @param array $options list of options as name/value pairs
-     *
-     * @return array options processed
+     * @return array options with raw content converted to tmp files where neccessary
      */
-    public function processOptions($options=array())
+    protected function processOptions($options=array())
     {
         foreach ($options as $key=>$val) {
-            if (preg_match('/^(header|footer)-html$/', $key) &&
-                !(is_file($val) || preg_match('/^(https?:)?\/\//i',$val) || $val===strip_tags($val))) {
-                $options[$key] = $this->createTmpFile($val);
+            $urlRequired = preg_match('/^(header|footer)-html$/', $key);
+            if ($urlRequired && !(is_file($val) || preg_match('/^(https?:)?\/\//i',$val) || $val===strip_tags($val))) {
+                $options[$key] = new TmpFile($val, '.html');
             }
         }
-
         return $options;
-    }
-
-    /**
-     * @return string the full path to the wkhtmltopdf binary.
-     */
-    public function getBin()
-    {
-        if ($this->binPath===null) {
-            if ($this->getIsWindows()) {
-                $this->binPath = trim(shell_exec('where '.$this->binName));
-            } else {
-                $this->binPath = trim(shell_exec('which '.$this->binName));
-            }
-        }
-        return $this->binPath;
-    }
-
-    /**
-     * @return string the full path to the xvfb-run binary
-     */
-    public function getXvfbRunBin()
-    {
-        if ($this->xvfbRunBin===null) {
-            if ($this->getIsWindows()) {
-                return null;
-            } else {
-                $this->xvfbRunBin = trim(shell_exec('which xvfb-run'));
-            }
-        }
-        return $this->xvfbRunBin;
-    }
-
-    /**
-     * @return bool whether we're on a Windows OS
-     */
-    public function getIsWindows()
-    {
-        if ($this->isWindows===null) {
-            $this->isWindows = strtoupper(substr(PHP_OS, 0, 3))==='WIN';
-        }
-        return $this->isWindows;
-    }
-
-    /**
-     * @return mixed the detailled error message including the wkhtmltopdf command or null if none
-     */
-    public function getError()
-    {
-        return $this->error;
-    }
-
-    /**
-     * @return string path to temp directory
-     */
-    public function getTmpDir()
-    {
-        if ($this->tmp===null) {
-            if (function_exists('sys_get_temp_dir')) {
-                $this->tmp = sys_get_temp_dir();
-            } elseif ( ($tmp = getenv('TMP')) || ($tmp = getenv('TEMP')) || ($tmp = getenv('TMPDIR')) ) {
-                $this->tmp = realpath($tmp);
-            } else {
-                $this->tmp = '/tmp';
-            }
-        }
-
-        return $this->tmp;
-    }
-
-    /**
-     * @param string $filename the filename of the output file
-     * @return string the wkhtmltopdf command string
-     */
-    public function getCommand($filename)
-    {
-        $command = $this->escape($this->getBin());
-
-        $command .= $this->renderOptions($this->options);
-
-        foreach($this->objects as $object)
-        {
-            $command .= ' '.$this->escape($object['input']);
-            unset($object['input']);
-            $command .= $this->renderOptions($object);
-        }
-
-        return $command.' '.$this->escape($filename);
-    }
-
-    /**
-     * @return mixed the temporary PDF filename or false on error (triggers PDf creation)
-     */
-    public function getPdfFilename()
-    {
-        if ($this->tmpFile===null) {
-            $tmpFile = tempnam($this->getTmpDir(),'tmp_WkHtmlToPdf_');
-
-            if ($this->createPdf($tmpFile)===true) {
-                $this->tmpFile = $tmpFile;
-            } else {
-                return false;
-            }
-        }
-
-        return $this->tmpFile;
-    }
-
-    /**
-     * Create the temporary PDF file
-     */
-    protected function createPdf($fileName)
-    {
-        $command = $this->getCommand($fileName);
-
-        if($this->enableXvfb) {
-            $command = $this->xvfbRunCommand($command);
-        }
-
-        // we use proc_open with pipes to fetch error output
-        $descriptors = array(
-            2   => array('pipe','w'),
-        );
-        $process = proc_open($command, $descriptors, $pipes, null, $this->procEnv, array('bypass_shell'=>true));
-
-        if (is_resource($process)) {
-
-            $stderr = stream_get_contents($pipes[2]);
-            fclose($pipes[2]);
-
-            $result = proc_close($process);
-
-            if ($result!==0) {
-                if (!file_exists($fileName) || filesize($fileName)===0) {
-                    $this->error = "Could not run command $command:\n$stderr";
-                } elseif (!$this->ignoreWarnings) {
-                    $this->error = "Warning: An error occured while creating the PDF:\n$stderr";
-                }
-            }
-        } else {
-            $this->error = "Could not run command $command";
-        }
-
-        return $this->error===null;
-    }
-
-    /**
-     * Create a tmp file with given content
-     *
-     * @param string $content the file content
-     * @return string the path to the created file
-     */
-    protected function createTmpFile($content)
-    {
-        $tmpFile = tempnam($this->getTmpDir(),'tmp_WkHtmlToPdf_');
-        rename($tmpFile, ($tmpFile.='.html'));
-        file_put_contents($tmpFile, $content);
-
-        $this->tmpFiles[] = $tmpFile;
-
-        return $tmpFile;
-    }
-
-    /**
-     * @param array $options for a wkhtml, either global or for an object
-     * @return string the string with options
-     */
-    protected function renderOptions($options)
-    {
-        $out = '';
-        foreach($options as $key=>$val)
-            if (is_numeric($key)) {
-                $out .= " --$val";
-            } elseif (is_array($val)) {
-                foreach($val as $vkey => $vval) {
-                    if(is_numeric($vkey)) {
-                        $out .= " --$key ".$this->escape($vval);
-                    } else {
-                        $out .= " --$key ".$this->escape($vkey).' '.$this->escape($vval);
-                    }
-                }
-            } else {
-                $out .= " --$key ".$this->escape($val);
-            }
-
-        return $out;
-    }
-
-    /**
-     * @param mixed $val value to escape
-     * @return string the escaped value if enableEscaping is set. Unchanged value otherwhise.
-     */
-    protected function escape($val)
-    {
-        return $this->enableEscaping ? escapeshellarg($val) : $val;
-    }
-
-    /**
-     * Wrap the given command in a call to xvfb-run
-     *
-     * @param string $command the command to wrap in xvfb-run
-     * @return string the command string with the xvfb-run call prepended
-     */
-    protected function xvfbRunCommand($command)
-    {
-        $xvfbRun = $this->getXvfbRunBin();
-        if(!$xvfbRun) {
-            return $command;
-        }
-
-        return $xvfbRun.$this->xvfbRunOptions.$command;
     }
 }
