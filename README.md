@@ -148,12 +148,19 @@ if (!$pdf->send()) {
 ## Note for Windows users
 
 If you use double quotes (`"`) or percent signs (`%`) as option values, they may get converted to spaces.
-In this case you can disable argument escaping in the `Command`:
+In this case you can disable argument escaping in the `Command`. There are also two interesting options to
+`proc_open()` that you may want to use:
 
 ```php
 $pdf = new Pdf(array(
     'commandOptions' => array(
         'escapeArgs' => false,
+        'procOptions' => array(
+            // This will bypass the cmd.exe which seems to be recommended
+            'bypass_shell' => true,
+            // Try this if you get weird errors
+            'suppress_errors' => true,
+        ),
     ),
     ...
 ));
