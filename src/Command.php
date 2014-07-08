@@ -4,7 +4,14 @@ namespace mikehaertl\wkhtmlto;
 use mikehaertl\shellcommand\Command as BaseCommand;
 
 /**
- * The command class with extras for wk* tools
+ * Command
+ *
+ * This class is an extension of mikehaertl\shellcommand\Command and adds
+ * wk* specific features like xvfb support and proper argument handling.
+ *
+ * @author Michael Härtl <haertl.mike@gmail.com>
+ * @version 2.0.0-dev
+ * @license http://www.opensource.org/licenses/MIT
  */
 class Command extends BaseCommand
 {
