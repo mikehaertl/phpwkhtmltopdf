@@ -34,8 +34,12 @@ class Command extends BaseCommand
     /**
      * @param array $args args to add to the command. These can be:
      *     array(
-     *       // Special argument 'input' will not get prepended with '--'
-     *       'input' => '/tmp/inFile.html',
+     *       // Special argument 'input' will not get prepended with '--'.
+     *       'input' => 'cover',
+     *
+     *       // Special argument 'inputArg' is treated like 'input' but will get escaped
+     *       // Both 'input' and 'inputArg' can be used in combination
+     *       'inputArg' => '/tmp/tmpFileName.html',
      *
      *       'no-outline',           // option without argument
      *       'encoding' => 'UTF-8',  // option with argument
@@ -58,8 +62,14 @@ class Command extends BaseCommand
     public function addArgs($args)
     {
         if (isset($args['input'])) {
-            $this->addArg((string) $args['input']);    // Typecasts TmpFile to filename
+            // Typecasts TmpFile to filename
+            $this->addArg((string) $args['input']);
             unset($args['input']);
+        }
+        if (isset($args['inputArg'])) {
+            // Typecasts TmpFile to filename and escapes argument
+            $this->addArg((string) $args['inputArg'], null, true);
+            unset($args['inputArg']);
         }
         foreach($args as $key=>$val) {
             if (is_numeric($key)) {

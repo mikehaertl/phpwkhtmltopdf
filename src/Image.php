@@ -152,7 +152,7 @@ class Image
     }
 
     /**
-     * @return mikehaertl\shellcommand\Command the command instance that executes wkhtmltopdf
+     * @return Command the command instance that executes wkhtmltopdf
      */
     public function getCommand()
     {
@@ -215,8 +215,9 @@ class Image
         $fileName = $this->getImageFilename();
 
         $command->addArgs($this->_options);
-        $command->addArg((string) $this->_page);
-        $command->addArg($fileName);
+        // Always escape input and output filename
+        $command->addArg((string) $this->_page, null, true);
+        $command->addArg($fileName, null, true);
         if (!$command->execute()) {
             $this->_error = $command->getError();
             if (!(file_exists($fileName) && filesize($fileName)!==0 && $this->ignoreWarnings)) {

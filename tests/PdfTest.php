@@ -18,7 +18,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertEquals("$binary $inFile $tmpFile", (string) $pdf->getCommand());
+        $this->assertEquals("$binary '$inFile' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
     public function testCanCreatePdfFromHtmlString()
@@ -32,7 +32,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary [^ ]+ $tmpFile#", (string) $pdf->getCommand());
+        $this->assertRegExp("#$binary '[^ ]+' '$tmpFile'#", (string) $pdf->getCommand());
         unlink($outFile);
     }
     public function testCanCreatePdfFromUrl()
@@ -47,7 +47,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertEquals("$binary $url $tmpFile", (string) $pdf->getCommand());
+        $this->assertEquals("$binary '$url' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
 
@@ -67,7 +67,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
 
         $tmpFile = $pdf->getPdfFilename();
         $command = (string)$pdf->getCommand();
-        $this->assertEquals("$binary $inFile $inFile $tmpFile", $command);
+        $this->assertEquals("$binary '$inFile' '$inFile' '$tmpFile'", $command);
         unlink($outFile);
     }
     public function testCanAddPagesFromHtmlString()
@@ -83,7 +83,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary [^ ]+ [^ ]+ $tmpFile#", (string) $pdf->getCommand());
+        $this->assertRegExp("#$binary '[^ ]+' '[^ ]+' '$tmpFile'#", (string) $pdf->getCommand());
         unlink($outFile);
     }
     public function testCanAddPagesFromUrl()
@@ -100,7 +100,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertEquals("$binary $url $url $tmpFile", (string) $pdf->getCommand());
+        $this->assertEquals("$binary '$url' '$url' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
 
@@ -119,7 +119,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
 
         $tmpFile = $pdf->getPdfFilename();
         $command = (string)$pdf->getCommand();
-        $this->assertEquals("$binary cover $inFile $tmpFile", $command);
+        $this->assertEquals("$binary cover '$inFile' '$tmpFile'", $command);
         unlink($outFile);
     }
     public function testCanAddCoverFromHtmlString()
@@ -134,7 +134,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary cover [^ ]+ $tmpFile#", (string) $pdf->getCommand());
+        $this->assertRegExp("#$binary cover '[^ ]+' '$tmpFile'#", (string) $pdf->getCommand());
         unlink($outFile);
     }
     public function testCanAddCoverFromUrl()
@@ -150,7 +150,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertEquals("$binary cover $url $tmpFile", (string) $pdf->getCommand());
+        $this->assertEquals("$binary cover '$url' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
 
@@ -167,7 +167,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary [^ ]+ toc $tmpFile#", (string) $pdf->getCommand());
+        $this->assertRegExp("#$binary '[^ ]+' toc '$tmpFile'#", (string) $pdf->getCommand());
         unlink($outFile);
     }
 
@@ -192,7 +192,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
 
         $tmpFile = $pdf->getPdfFilename();
         $this->assertFileExists($outFile);
-        $this->assertEquals("$binary --no-outline --margin-top '0' --allow '/tmp' --allow '/test' $inFile $tmpFile", (string) $pdf->getCommand());
+        $this->assertEquals("$binary --no-outline --margin-top '0' --allow '/tmp' --allow '/test' '$inFile' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
     public function testCanSetGlobalOptions()
@@ -212,7 +212,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertEquals("$binary --no-outline --margin-top '0' $inFile $tmpFile", (string) $pdf->getCommand());
+        $this->assertEquals("$binary --no-outline --margin-top '0' '$inFile' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
     public function testSetPageCoverAndTocOptions()
@@ -249,7 +249,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertEquals("$binary --no-outline --margin-top '0' --header-center 'test {x} {y}' $inFile --no-background --zoom '1.5' --cookie 'name' 'value' --replace '{x}' 'x' --replace '{y}' '' cover $inFile --replace '{x}' 'a' --replace '{y}' 'b' toc --disable-dotted-lines $tmpFile", (string) $pdf->getCommand());
+        $this->assertEquals("$binary --no-outline --margin-top '0' --header-center 'test {x} {y}' '$inFile' --no-background --zoom '1.5' --cookie 'name' 'value' --replace '{x}' 'x' --replace '{y}' '' cover '$inFile' --replace '{x}' 'a' --replace '{y}' 'b' toc --disable-dotted-lines '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
     public function testCanAddHeaderAndFooterAsHtml()
@@ -268,7 +268,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary --header-html '/tmp/[^ ]+' --footer-html '/tmp/[^ ]+' $inFile $tmpFile#", (string) $pdf->getCommand());
+        $this->assertRegExp("#$binary --header-html '/tmp/[^ ]+' --footer-html '/tmp/[^ ]+' '$inFile' '$tmpFile'#", (string) $pdf->getCommand());
         unlink($outFile);
     }
 
@@ -290,8 +290,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($pdf->saveAs($outFile));
 
         $tmpFile = $pdf->getPdfFilename();
-        $command = (string)$pdf->getCommand();
-        $this->assertEquals("xvfb-run --server-args=\"-screen 0, 1024x768x24\" $binary $inFile $tmpFile", $command);
+        $this->assertEquals("xvfb-run --server-args=\"-screen 0, 1024x768x24\" $binary '$inFile' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
 

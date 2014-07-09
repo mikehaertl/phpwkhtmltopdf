@@ -99,7 +99,7 @@ class Pdf
     public function addPage($input,$options=array())
     {
         $options = $this->processOptions($options);
-        $options['input'] = $this->processInput($input);
+        $options['inputArg'] = $this->processInput($input);
         $this->_objects[] = $options;
         return $this;
     }
@@ -113,7 +113,8 @@ class Pdf
      */
     public function addCover($input,$options=array())
     {
-        $options['input'] = ($this->version9 ? '--' : '').'cover '.$this->processInput($input);
+        $options['input'] = ($this->version9 ? '--' : '').'cover';
+        $options['inputArg'] = $this->processInput($input);
         $this->_objects[] = $options;
         return $this;
     }
@@ -188,7 +189,7 @@ class Pdf
     }
 
     /**
-     * @return mikehaertl\shellcommand\Command the command instance that executes wkhtmltopdf
+     * @return Command the command instance that executes wkhtmltopdf
      */
     public function getCommand()
     {
@@ -238,7 +239,7 @@ class Pdf
         foreach ($this->_objects as $object) {
             $command->addArgs($object);
         }
-        $command->addArg($fileName);
+        $command->addArg($fileName, null, true);    // Always escape filename
         if (!$command->execute()) {
             $this->_error = $command->getError();
             if (!(file_exists($fileName) && filesize($fileName)!==0 && $this->ignoreWarnings)) {
