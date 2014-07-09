@@ -10,12 +10,23 @@ PHP WkHtmlToPdf
 PHP WkHtmlToPdf provides a simple and clean interface to ease PDF and image creation with
 [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/).
 
-**The [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/) command must be installed and working on your system.**
+**The [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/) and - optionally - `wkhtmltoimage` command must be installed and working on your system.**
 See the section below for details.
 
 ## Quickstart
 
-Install the package through [composer](http://getcomposer.org).
+Install the package and - optionally - the binaries through [composer](http://getcomposer.org):
+
+```
+composer require mikehaertl/phpwkhtmltopdf
+
+// Optional (pick the right package for your architecture):
+composer require h4cc/wkhtmltopdf-i386
+composer require h4cc/wkhtmltoimage-i386
+composer require h4cc/wkhtmltopdf-amd64
+composer require h4cc/wkhtmltoimage-amd64
+```
+
 
 ### Single page PDF
 
@@ -24,6 +35,11 @@ use mikehaertl\wkhtmlto\Pdf;
 
 // You can pass a filename, a HTML string or an URL to the constructor
 $pdf = new Pdf('/home/joe/page.html');
+
+// If you installed the binary through composer, you need to configure
+// the right path to the binary (modify to match your path/version):
+$pdf->binary = __DIR__'/vendor/bin/wkhtmltopdf-i386';
+
 $pdf->saveAs('/tmp/new.pdf');
 ```
 
@@ -31,7 +47,6 @@ $pdf->saveAs('/tmp/new.pdf');
 
 
 ```php
-<?php
 $pdf = new Pdf;
 $pdf->addPage('/home/joe/page.html');
 $pdf->addPage('<html>....</html>');
