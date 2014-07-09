@@ -10,7 +10,7 @@ use mikehaertl\shellcommand\Command as BaseCommand;
  * wk* specific features like xvfb support and proper argument handling.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @version 2.0.0
+ * @version 2.0.1-dev
  * @license http://www.opensource.org/licenses/MIT
  */
 class Command extends BaseCommand

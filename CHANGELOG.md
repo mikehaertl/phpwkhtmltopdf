@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.1
+
+WIP
+
 ## 2.0.0
 
 In this major release we have added a wrapper for wkhtmltopdf and cleaned
