@@ -13,6 +13,7 @@
     ],
     "require": {
         "php": ">=5.0.0",
+        "mikehaertl/php-tmpfile": "*",
         "mikehaertl/php-shellcommand": "~1.0.2"
     },
     "autoload": {

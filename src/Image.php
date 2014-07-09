@@ -1,6 +1,8 @@
 <?php
 namespace mikehaertl\wkhtmlto;
 
+use mikehaertl\tmp\File;
+
 /**
  * Pdf
  *
@@ -14,6 +16,9 @@ class Image
 {
     // Regular expression to detect HTML strings
     const REGEX_HTML = '/<html/i';
+
+    // prefix for tmp files
+    const TMP_PREFIX = 'tmp_wkhtmlto_pdf_';
 
     /**
      * @var string the name of the `wkhtmltoimage` binary. Default is `wkhtmltoimage`. You can also
@@ -47,7 +52,7 @@ class Image
     protected $_isCreated = false;
 
     /**
-     * @var TmpFile|string the page input or a TmpFile instance for HTML string inputs
+     * @var mikehaertl\tmp\File|string the page input or a File instance for HTML string inputs
      */
     protected $_page;
 
@@ -57,7 +62,7 @@ class Image
     protected $_options = array();
 
     /**
-     * @var TmpFile the temporary image file
+     * @var mikehaertl\tmp\File the temporary image file
      */
     protected $_tmpImageFile;
 
@@ -91,7 +96,7 @@ class Image
      */
     public function setPage($page)
     {
-        $this->_page = preg_match(self::REGEX_HTML, $page) ? new TmpFile($page, '.html') : $page;
+        $this->_page = preg_match(self::REGEX_HTML, $page) ? new File($page, '.html') : $page;
         return $this;
     }
 
@@ -106,8 +111,7 @@ class Image
         if (!$this->_isCreated && !$this->createImage()) {
             return false;
         }
-        $tmpFile = $this->getImageFilename();
-        if (!copy($tmpFile,$filename)) {
+        if (!$this->_tmpImageFile->saveAs($filename)) {
             $this->_error = "Could not copy image from tmp location '$tmpFile' to '$filename'";
             return false;
         }
@@ -180,7 +184,7 @@ class Image
     public function getImageFilename()
     {
         if ($this->_tmpImageFile===null) {
-            $this->_tmpImageFile = new TmpFile('', '.'.$this->type);
+            $this->_tmpImageFile = new File('', '.'.$this->type, self::TMP_PREFIX);
         }
         return $this->_tmpImageFile->getFileName();
     }

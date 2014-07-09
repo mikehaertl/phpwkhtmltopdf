@@ -1,6 +1,8 @@
 <?php
 namespace mikehaertl\wkhtmlto;
 
+use mikehaertl\tmp\File;
+
 /**
  * Pdf
  *
@@ -14,6 +16,9 @@ class Pdf
 {
     // Regular expression to detect HTML strings
     const REGEX_HTML = '/<html/i';
+
+    // prefix for tmp files
+    const TMP_PREFIX = 'tmp_wkhtmlto_pdf_';
 
     /**
      * @var string the name of the `wkhtmltopdf` binary. Default is `wkhtmltopdf`. You can also
@@ -57,13 +62,13 @@ class Pdf
     protected $_objects = array();
 
     /**
-     * @var TmpFile the temporary PDF file
+     * @var mikehaertl\tmp\File the temporary PDF file
      */
     protected $_tmpPdfFile;
 
     /**
-     * @var array list of TmpFile objects. This is here to keep a reference to TmpFile and thus avoid
-     * too early call of TmpFile::__destruct() if the file is not referenced anymore.
+     * @var array list of tmp file objects. This is here to keep a reference to File and thus avoid
+     * too early call of File::__destruct() if the file is not referenced anymore.
      */
     protected $_tmpFiles = array();
 
@@ -143,9 +148,8 @@ class Pdf
         if (!$this->_isCreated && !$this->createPdf()) {
             return false;
         }
-        $tmpFile = $this->getPdfFilename();
-        if (!copy($tmpFile,$filename)) {
-            $this->_error = "Could not copy PDF from tmp location '$tmpFile' to '$filename'";
+        if (!$this->_tmpPdfFile->saveAs($filename)) {
+            $this->_error = "Could not save PDF as '$filename'";
             return false;
         }
         return true;
@@ -217,7 +221,7 @@ class Pdf
     public function getPdfFilename()
     {
         if ($this->_tmpPdfFile===null) {
-            $this->_tmpPdfFile = new TmpFile('', '.pdf');
+            $this->_tmpPdfFile = new File('', '.pdf',self::TMP_PREFIX);
         }
         return $this->_tmpPdfFile->getFileName();
     }
@@ -252,12 +256,12 @@ class Pdf
 
     /**
      * @param string $input
-     * @return TmpFile|string a TmpFile if the input is a html string. The unchanged input otherwhise.
+     * @return mikehaertl\tmp\File|string a File object if the input is a html string. The unchanged input otherwhise.
      */
     protected function processInput($input)
     {
         if (preg_match(self::REGEX_HTML, $input)) {
-            return $this->_tmpFiles[] = new TmpFile($input, '.html');
+            return $this->_tmpFiles[] = new File($input, '.html', self::TMP_PREFIX);
         } else {
             return $input;
         }
@@ -272,7 +276,7 @@ class Pdf
         foreach ($options as $key=>$val) {
             $urlRequired = preg_match('/^(header|footer)-html$/', $key);
             if ($urlRequired && !(is_file($val) || preg_match('/^(https?:)?\/\//i',$val) || $val===strip_tags($val))) {
-                $options[$key] = new TmpFile($val, '.html');
+                $options[$key] = new File($val, '.html', self::TMP_PREFIX);
             }
         }
         return $options;
