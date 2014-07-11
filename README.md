@@ -5,6 +5,7 @@ PHP WkHtmlToPdf
 [![Latest Stable Version](https://poser.pugx.org/mikehaertl/phpwkhtmltopdf/v/stable.svg)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
 [![Total Downloads](https://poser.pugx.org/mikehaertl/phpwkhtmltopdf/downloads.svg)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
 [![Latest Unstable Version](https://poser.pugx.org/mikehaertl/phpwkhtmltopdf/v/unstable.svg)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
+[![HHVM Status](http://hhvm.h4cc.de/badge/yiisoft/yii2-dev.png)](http://hhvm.h4cc.de/package/mikehaertl/phpwkhtmltopdf)
 [![License](https://poser.pugx.org/mikehaertl/phpwkhtmltopdf/license.svg)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
 
 PHP WkHtmlToPdf provides a simple and clean interface to ease PDF and image creation with
@@ -47,6 +48,8 @@ $pdf->saveAs('/tmp/new.pdf');
 
 
 ```php
+use mikehaertl\wkhtmlto\Pdf;
+
 $pdf = new Pdf;
 $pdf->addPage('/home/joe/page.html');
 $pdf->addPage('<html>....</html>');
