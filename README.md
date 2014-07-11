@@ -367,3 +367,8 @@ body {
     background: #ccc;
 }
 ```
+
+## Links
+
+Also check out my [php-pdftk](https://github.com/mikehaertl/php-pdftk) wrapper around `pdftk`
+which brings the full power of `pdftk` to PHP.
