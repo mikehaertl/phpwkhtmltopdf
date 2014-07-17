@@ -39,7 +39,7 @@ $pdf = new Pdf('/home/joe/page.html');
 
 // If you installed the binary through composer, you need to configure
 // the right path to the binary (modify to match your path/version):
-$pdf->binary = __DIR__'/vendor/bin/wkhtmltopdf-i386';
+$pdf->binary = __DIR__ . '/vendor/bin/wkhtmltopdf-i386';
 
 $pdf->saveAs('/tmp/new.pdf');
 ```
