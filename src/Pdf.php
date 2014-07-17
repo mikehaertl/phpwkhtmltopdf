@@ -221,7 +221,7 @@ class Pdf
     public function getPdfFilename()
     {
         if ($this->_tmpPdfFile===null) {
-            $this->_tmpPdfFile = new File('', '.pdf',self::TMP_PREFIX);
+            $this->_tmpPdfFile = new File('', '.pdf', self::TMP_PREFIX, $this->tmpDir);
         }
         return $this->_tmpPdfFile->getFileName();
     }
@@ -261,7 +261,7 @@ class Pdf
     protected function processInput($input)
     {
         if (preg_match(self::REGEX_HTML, $input)) {
-            return $this->_tmpFiles[] = new File($input, '.html', self::TMP_PREFIX);
+            return $this->_tmpFiles[] = new File($input, '.html', self::TMP_PREFIX, $this->tmpDir);
         } else {
             return $input;
         }
@@ -276,7 +276,7 @@ class Pdf
         foreach ($options as $key=>$val) {
             $urlRequired = preg_match('/^(header|footer)-html$/', $key);
             if ($urlRequired && !(is_file($val) || preg_match('/^(https?:)?\/\//i',$val) || $val===strip_tags($val))) {
-                $options[$key] = new File($val, '.html', self::TMP_PREFIX);
+                $options[$key] = new File($val, '.html', self::TMP_PREFIX, $this->tmpDir);
             }
         }
         return $options;
