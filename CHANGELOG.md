@@ -2,7 +2,7 @@
 
 ## 2.0.1
 
-WIP
+ * Issue #61: Fix ignored `tmpDir`
 
 ## 2.0.0
 
