@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.2
+
+ * WIP
+
 ## 2.0.1
 
  * Issue #61: Fix ignored `tmpDir`
