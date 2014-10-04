@@ -201,7 +201,7 @@ class Image
         } elseif ($this->type==='bmp') {
             return 'image/bmp';
         } else {
-            throw new Excpetion('Invalid image type');
+            throw new \Excpetion('Invalid image type');
         }
     }
 
