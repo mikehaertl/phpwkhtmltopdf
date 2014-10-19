@@ -21,11 +21,12 @@ Install the package and - optionally - the binaries through [composer](http://ge
 ```
 composer require mikehaertl/phpwkhtmltopdf
 
-// Optional (pick the right package for your architecture):
-composer require h4cc/wkhtmltopdf-i386
-composer require h4cc/wkhtmltoimage-i386
-composer require h4cc/wkhtmltopdf-amd64
-composer require h4cc/wkhtmltoimage-amd64
+// Optional (pick the right package for your os):
+composer require profburial/wkhtmltopdf-binaries-osx
+composer require profburial/wkhtmltopdf-binaries-centos6
+composer require profburial/wkhtmltopdf-binaries-precise
+composer require profburial/wkhtmltopdf-binaries-trusty
+composer require profburial/wkhtmltopdf-binaries-wheezy
 ```
 
 
@@ -208,7 +209,7 @@ install this command on your system before you can use the class. On Linux there
 
 ### Statically linked binary
 
-You can use `composer` to install the binaries from `h4cc/wkhtmltopdf-i386` or `h4cc/wkhtmltopdf-amd64`
+You can use `composer` to install the binaries from `profburial/wkhtmltopdf-binaries`
 and also the `wkhtmltoimage` counterparts. Or you can manually download and unzip the correct package for
 your architecture from [https://code.google.com/p/wkhtmltopdf/](https://code.google.com/p/wkhtmltopdf/).
 In both cases you have to tell the PHP class where to find the binary.
