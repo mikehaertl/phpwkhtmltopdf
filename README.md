@@ -195,6 +195,19 @@ I also found that some options don't work on Windows (tested with wkhtmltopdf 0.
 `user-style-sheet` option used in the example below.
 
 
+### Warning: proc_open(): CreateProcess failed
+
+In some versions of PHP for Windows, `proc_open()` does not work properly. If you experience this, you can use `exec()`
+to run the command as a workaround:
+
+```
+$pdf = new Pdf();
+$pdf->addPage('http://google.com');
+$cmd = $pdf->buildCommand()->getExecCommand();
+exec($cmd);
+```
+
+
 ## Setup for different wkhtmltopdf versions
 
 As mentioned before the PHP class is just a convenient frontend for the `wkhtmltopdf` command. So you need to

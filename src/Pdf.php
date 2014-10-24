@@ -236,14 +236,9 @@ class Pdf
         if ($this->_isCreated) {
             return false;
         }
-        $command = $this->getCommand();
         $fileName = $this->getPdfFilename();
+        $command = $this->buildCommand($fileName);
 
-        $command->addArgs($this->_options);
-        foreach ($this->_objects as $object) {
-            $command->addArgs($object);
-        }
-        $command->addArg($fileName, null, true);    // Always escape filename
         if (!$command->execute()) {
             $this->_error = $command->getError();
             if (!(file_exists($fileName) && filesize($fileName)!==0 && $this->ignoreWarnings)) {
@@ -252,6 +247,30 @@ class Pdf
         }
         $this->_isCreated = true;
         return true;
+    }
+
+
+    /**
+     * Build the Command with the arguments passed
+     *
+     * @param string $fileName The pdf filename
+     * @return \mikehaertl\wkhtmlto\Command
+     */
+    public function buildCommand($fileName = null)
+    {
+        if (is_null($fileName)) {
+            $fileName = $this->getPdfFilename();
+        }
+
+        $command = $this->getCommand();
+
+        $command->addArgs($this->_options);
+        foreach ($this->_objects as $object) {
+            $command->addArgs($object);
+        }
+        $command->addArg($fileName, null, true);    // Always escape filename
+
+        return $command;
     }
 
     /**
