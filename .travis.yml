@@ -7,9 +7,6 @@ php:
 before_install:
   - sudo apt-get update
 install:
-  - sudo apt-get install xvfb
-  - composer install
-  - composer require h4cc/wkhtmltopdf-amd64:0.12.1
-  - composer require h4cc/wkhtmltoimage-amd64:0.12.1
-  - ln -s ./wkhtmltopdf-amd64 vendor/bin/wkhtmltopdf
-  - ln -s ./wkhtmltoimage-amd64 vendor/bin/wkhtmltoimage
+  - sudo apt-get install xvfb curl
+  - curl -O 'http://skylink.dl.sourceforge.net/project/wkhtmltopdf/0.12.1/wkhtmltox-0.12.1_linux-precise-amd64.deb'
+  - dpkg -i ./wkhtmltox-0.12.1_linux-precise-amd64.deb

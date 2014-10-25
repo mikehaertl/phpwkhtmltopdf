@@ -11,23 +11,16 @@ PHP WkHtmlToPdf
 PHP WkHtmlToPdf provides a simple and clean interface to ease PDF and image creation with
 [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/).
 
-**The [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/) and - optionally - `wkhtmltoimage` command must be installed and working on your system.**
+**The [wkhtmltopdf](http://wkhtmltopdf.org) and - optionally - `wkhtmltoimage` command must be installed and working on your system.**
 See the section below for details.
 
-## Quickstart
+## Installation
 
-Install the package and - optionally - the binaries through [composer](http://getcomposer.org):
+Install the package through [composer](http://getcomposer.org):
 
 ```
 composer require mikehaertl/phpwkhtmltopdf
-
-// Optional (pick the right package for your architecture):
-composer require h4cc/wkhtmltopdf-i386
-composer require h4cc/wkhtmltoimage-i386
-composer require h4cc/wkhtmltopdf-amd64
-composer require h4cc/wkhtmltoimage-amd64
 ```
-
 
 ### Single page PDF
 
@@ -37,9 +30,8 @@ use mikehaertl\wkhtmlto\Pdf;
 // You can pass a filename, a HTML string or an URL to the constructor
 $pdf = new Pdf('/home/joe/page.html');
 
-// If you installed the binary through composer, you need to configure
-// the right path to the binary (modify to match your path/version):
-$pdf->binary = __DIR__ . '/vendor/bin/wkhtmltopdf-i386';
+// On some systems you may have to set the binary path.
+// $pdf->binary = 'C:\...';
 
 $pdf->saveAs('/tmp/new.pdf');
 ```
@@ -195,35 +187,20 @@ I also found that some options don't work on Windows (tested with wkhtmltopdf 0.
 `user-style-sheet` option used in the example below.
 
 
-## Setup for different wkhtmltopdf versions
+## Installation of wkhtmltopdf
 
-As mentioned before the PHP class is just a convenient frontend for the `wkhtmltopdf` command. So you need to
-install this command on your system before you can use the class. On Linux there are two flavours:
+It's recommended that you download the latest wkhtmltopdf from their website:
 
- *  Statically linked: You install a statically linked version via composer or download it from their
-    homepage. It's self-contained and thus the recommended way to use the class on most webservers.
- *  Dynamically linked: This is what you get for example on Ubuntu if you install the wkhtmltopdf package.
-    It will work, but requires an X server which is usually not available on headless webservers.
-    We therefore provide two Xvfb based workarounds below.
+ http://wkhtmltopdf.org/downloads.html
 
-### Statically linked binary
+These versions should run out of the box.
 
-You can use `composer` to install the binaries from `h4cc/wkhtmltopdf-i386` or `h4cc/wkhtmltopdf-amd64`
-and also the `wkhtmltoimage` counterparts. Or you can manually download and unzip the correct package for
-your architecture from [https://code.google.com/p/wkhtmltopdf/](https://code.google.com/p/wkhtmltopdf/).
-In both cases you have to tell the PHP class where to find the binary.
+If for some reason you can't do so, you may run into an issue with the dynamically linked version of
+`wkhtmltopdf`. This is what you get for example on Ubuntu 12.04 LTS if you install the wkhtmltopdf package.
+It will work, but to use all features it requires an X server which is usually not available on headless
+webservers.
 
-```php
-$pdf = new Pdf(array(
-    'binary' => '/path/to/your/wkhtmltopdf',
-    ...
-));
-```
-
-### Dynamically linked binary with Xvfb
-
-If you have to use the dynamically linked binary as it is provided by some Linux versions, you have two
-options. You can either use
+We therefore provide two Xvfb based workarounds. You can either use
 
  * the built in Xvfb support or
  * a standalone Xvfb server.
