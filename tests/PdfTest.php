@@ -298,7 +298,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
 
     protected function getBinary()
     {
-        return realpath(__DIR__.'/../vendor/bin/wkhtmltopdf');
+        return '/usr/local/bin/wkhtmltopdf';
     }
 
     protected function getHtmlAsset()
