@@ -8,5 +8,6 @@ before_install:
   - sudo apt-get update
 install:
   - sudo apt-get install xvfb curl
-  - curl -O 'http://skylink.dl.sourceforge.net/project/wkhtmltopdf/0.12.1/wkhtmltox-0.12.1_linux-precise-amd64.deb'
-  - dpkg -i ./wkhtmltox-0.12.1_linux-precise-amd64.deb
+  - sudo curl -O 'http://skylink.dl.sourceforge.net/project/wkhtmltopdf/0.12.1/wkhtmltox-0.12.1_linux-precise-amd64.deb'
+  - sudo dpkg -i ./wkhtmltox-0.12.1_linux-precise-amd64.deb
+  - composer install
