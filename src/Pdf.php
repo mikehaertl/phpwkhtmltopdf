@@ -17,6 +17,9 @@ class Pdf
     // Regular expression to detect HTML strings
     const REGEX_HTML = '/<html/i';
 
+    // Regular expression to detect XML strings
+    const REGEX_XML = '/<\??xml/i';
+
     // prefix for tmp files
     const TMP_PREFIX = 'tmp_wkhtmlto_pdf_';
 
@@ -262,6 +265,8 @@ class Pdf
     {
         if (preg_match(self::REGEX_HTML, $input)) {
             return $this->_tmpFiles[] = new File($input, '.html', self::TMP_PREFIX, $this->tmpDir);
+        } elseif (preg_match(self::REGEX_XML, $input)) {
+            return $this->_tmpFiles[] = new File($input, '.xml', self::TMP_PREFIX, $this->tmpDir);
         } else {
             return $input;
         }
