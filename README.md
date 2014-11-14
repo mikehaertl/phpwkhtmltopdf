@@ -287,6 +287,7 @@ $pdf->send();
 **demo.html**
 ```html
 <!DOCTYPE html>
+<html>
 <head>
 </head>
 <body>
