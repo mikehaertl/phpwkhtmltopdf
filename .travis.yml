@@ -8,7 +8,7 @@ before_install:
   - sudo apt-get update
 install:
   - sudo apt-get install xvfb curl wget
-  - echo "content-disposition = on" >> /etc/wgetrc
+  - sudo echo "content-disposition = on" >> /etc/wgetrc
   - sudo wget 'http://downloads.sourceforge.net/project/wkhtmltopdf/archive/0.12.1/wkhtmltox-0.12.1_linux-precise-amd64.deb?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fwkhtmltopdf%2Ffiles%2Farchive%2F0.12.1%2Fwkhtmltox-0.12.1_linux-precise-amd64.deb%2Fdownload%3Fuse_mirror%3Dnetcologne&ts=1422007350&use_mirror=hivelocity'
   - sudo dpkg -i ./wkhtmltox-0.12.1_linux-precise-amd64.deb
   - composer install
