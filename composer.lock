@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "2458b1b7de3587b12ec7e373e1597fd3",
+    "hash": "64ba14a5c5026cfc13c6bebb9867ac1d",
     "packages": [
         {
             "name": "mikehaertl/php-shellcommand",
@@ -84,6 +84,7 @@
     "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": false,
+    "prefer-lowest": false,
     "platform": {
         "php": ">=5.0.0"
     },
