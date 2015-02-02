@@ -9,10 +9,8 @@ PHP WkHtmlToPdf
 [![License](https://poser.pugx.org/mikehaertl/phpwkhtmltopdf/license.svg)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
 
 PHP WkHtmlToPdf provides a simple and clean interface to ease PDF and image creation with
-[wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/).
-
-**The [wkhtmltopdf](http://wkhtmltopdf.org) and - optionally - `wkhtmltoimage` command must be installed and working on your system.**
-See the section below for details.
+[wkhtmltopdf](http://wkhtmltopdf.org). **The `wkhtmltopdf` and - optionally - `wkhtmltoimage`
+command must be installed and working on your system.** See the section below for details.
 
 ## Installation
 
