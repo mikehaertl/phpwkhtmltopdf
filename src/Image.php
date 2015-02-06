@@ -8,7 +8,7 @@ use mikehaertl\tmp\File;
  *
  * This class is a slim wrapper around wkhtmltoimage.
  *
- * @author Michael Härtl <haertl.mike@gmail.com>
+ * @author  Michael Härtl <haertl.mike@gmail.com>
  * @version 2.0.2-dev
  * @license http://www.opensource.org/licenses/MIT
  */
@@ -49,37 +49,37 @@ class Image
     /**
      * @var bool whether the PDF was created
      */
-    protected $_isCreated = false;
+    protected $isCreated = false;
 
     /**
-     * @var mikehaertl\tmp\File|string the page input or a File instance for HTML string inputs
+     * @var File|string the page input or a File instance for HTML string inputs
      */
-    protected $_page;
+    protected $page;
 
     /**
      * @var array options for wkhtmltoimage as array('--opt1', '--opt2'=>'val', ...)
      */
-    protected $_options = array();
+    protected $options = array();
 
     /**
-     * @var mikehaertl\tmp\File the temporary image file
+     * @var File the temporary image file
      */
-    protected $_tmpImageFile;
+    protected $tmpImageFile;
 
     /**
      * @var Command the command instance that executes wkhtmltopdf
      */
-    protected $_command;
+    protected $command;
 
     /**
      * @var string the detailed error message. Empty string if none.
      */
-    protected $_error = '';
+    protected $error = '';
 
     /**
      * @param array|string $options global options for wkhtmltoimage or page URL, HTML or PDF/HTML filename
      */
-    public function __construct($options=null)
+    public function __construct($options = null)
     {
         if (is_array($options)) {
             $this->setOptions($options);
@@ -91,28 +91,29 @@ class Image
     /**
      * Add a page object to the output
      *
-     * @param string $page either a URL, a HTML string or a PDF/HTML filename
+     * @param  string $page either a URL, a HTML string or a PDF/HTML filename
      * @return Image the Image instance for method chaining
      */
     public function setPage($page)
     {
-        $this->_page = preg_match(self::REGEX_HTML, $page) ? new File($page, '.html') : $page;
+        $this->page = preg_match(self::REGEX_HTML, $page) ? new File($page, '.html') : $page;
         return $this;
     }
 
     /**
      * Save the image to given filename (triggers image creation)
      *
-     * @param string $filename to save image as
+     * @param  string $filename to save image as
      * @return bool whether image was created successfully
      */
     public function saveAs($filename)
     {
-        if (!$this->_isCreated && !$this->createImage()) {
+        if (!$this->isCreated && !$this->createImage()) {
             return false;
         }
-        if (!$this->_tmpImageFile->saveAs($filename)) {
-            $this->_error = "Could not copy image from tmp location '$tmpFile' to '$filename'";
+        if (!$this->tmpImageFile->saveAs($filename)) {
+            $tempDir = $this->tmpImageFile->getTempDir();
+            $this->error = "Could not copy image from tmp location '$tempDir' to '$filename'";
             return false;
         }
         return true;
@@ -121,35 +122,35 @@ class Image
     /**
      * Send image to client, either inline or as download (triggers image creation)
      *
-     * @param string|null $filename the filename to send. If empty, the PDF is streamed inline. Note, that
+     * @param  string|null $filename the filename to send. If empty, the PDF is streamed inline. Note, that
      * the file extension must match what you configured as $type (png, jpg, ...).
-     * @param bool $inline whether to force inline display of the image, even if filename is present.
+     * @param  bool        $inline   whether to force inline display of the image, even if filename is present.
      * @return bool whether image was created successfully
      */
-    public function send($filename=null,$inline=false)
+    public function send($filename = null, $inline = false)
     {
-        if (!$this->_isCreated && !$this->createImage()) {
+        if (!$this->isCreated && !$this->createImage()) {
             return false;
         }
-        $this->_tmpImageFile->send($filename, $this->getMimeType(), $inline);
+        $this->tmpImageFile->send($filename, $this->getMimeType(), $inline);
         return true;
     }
 
     /**
      * Set options
      *
-     * @param array $options list of image options to set as name/value pairs
+     * @param  array $options list of image options to set as name/value pairs
      * @return Image the Image instance for method chaining
      */
-    public function setOptions($options=array())
+    public function setOptions($options = array())
     {
-        foreach ($options as $key=>$val) {
+        foreach ($options as $key => $val) {
             if (is_int($key)) {
-                $this->_options[] = $val;
+                $this->options[] = $val;
             } elseif ($key[0]!=='_' && property_exists($this, $key)) {
                 $this->$key = $val;
             } else {
-                $this->_options[$key] = $val;
+                $this->options[$key] = $val;
             }
         }
         return $this;
@@ -160,14 +161,14 @@ class Image
      */
     public function getCommand()
     {
-        if ($this->_command===null) {
+        if ($this->command===null) {
             $options = $this->commandOptions;
             if (!isset($options['command'])) {
                 $options['command'] = $this->binary;
             }
-            $this->_command = new Command($options);
+            $this->command = new Command($options);
         }
-        return $this->_command;
+        return $this->command;
     }
 
     /**
@@ -175,7 +176,7 @@ class Image
      */
     public function getError()
     {
-        return $this->_error;
+        return $this->error;
     }
 
     /**
@@ -183,14 +184,15 @@ class Image
      */
     public function getImageFilename()
     {
-        if ($this->_tmpImageFile===null) {
-            $this->_tmpImageFile = new File('', '.'.$this->type, self::TMP_PREFIX);
+        if ($this->tmpImageFile===null) {
+            $this->tmpImageFile = new File('', '.'.$this->type, self::TMP_PREFIX);
         }
-        return $this->_tmpImageFile->getFileName();
+        return $this->tmpImageFile->getFileName();
     }
 
     /**
      * @return string the mime type for the current image
+     * @throws \Exception for Invalid image type.
      */
     public function getMimeType()
     {
@@ -201,7 +203,7 @@ class Image
         } elseif ($this->type==='bmp') {
             return 'image/bmp';
         } else {
-            throw new \Excpetion('Invalid image type');
+            throw new \Exception('Invalid image type');
         }
     }
 
@@ -212,23 +214,23 @@ class Image
      */
     protected function createImage()
     {
-        if ($this->_isCreated) {
+        if ($this->isCreated) {
             return false;
         }
         $command = $this->getCommand();
         $fileName = $this->getImageFilename();
 
-        $command->addArgs($this->_options);
+        $command->addArgs($this->options);
         // Always escape input and output filename
-        $command->addArg((string) $this->_page, null, true);
+        $command->addArg((string) $this->page, null, true);
         $command->addArg($fileName, null, true);
         if (!$command->execute()) {
-            $this->_error = $command->getError();
+            $this->error = $command->getError();
             if (!(file_exists($fileName) && filesize($fileName)!==0 && $this->ignoreWarnings)) {
                 return false;
             }
         }
-        $this->_isCreated = true;
+        $this->isCreated = true;
         return true;
     }
 }

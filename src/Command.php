@@ -9,7 +9,7 @@ use mikehaertl\shellcommand\Command as BaseCommand;
  * This class is an extension of mikehaertl\shellcommand\Command and adds
  * wk* specific features like xvfb support and proper argument handling.
  *
- * @author Michael Härtl <haertl.mike@gmail.com>
+ * @author  Michael Härtl <haertl.mike@gmail.com>
  * @version 2.0.2-dev
  * @license http://www.opensource.org/licenses/MIT
  */
@@ -71,11 +71,11 @@ class Command extends BaseCommand
             $this->addArg((string) $args['inputArg'], null, true);
             unset($args['inputArg']);
         }
-        foreach($args as $key=>$val) {
+        foreach ($args as $key => $val) {
             if (is_numeric($key)) {
                 $this->addArg("--$val");
             } elseif (is_array($val)) {
-                foreach($val as $vkey => $vval) {
+                foreach ($val as $vkey => $vval) {
                     if (is_int($vkey)) {
                         $this->addArg("--$key", $vval);
                     } else {
@@ -100,4 +100,3 @@ class Command extends BaseCommand
         return $command;
     }
 }
-

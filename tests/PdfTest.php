@@ -1,9 +1,12 @@
 <?php
+
+namespace mikehaertl\wkhtmlto\PdfTest;
+
 use mikehaertl\wkhtmlto\Pdf;
 
 class PdfTest extends \PHPUnit_Framework_TestCase
 {
-    CONST URL = 'http://www.google.com/robots.txt';
+    const URL = 'http://www.google.com/robots.txt';
 
     // Create PDF through constructor
     public function testCanCreatePdfFromFile()
@@ -21,6 +24,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("$binary '$inFile' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
+
     public function testCanCreatePdfFromHtmlString()
     {
         $outFile = $this->getOutFile();
@@ -35,6 +39,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp("#$binary '[^ ]+' '$tmpFile'#", (string) $pdf->getCommand());
         unlink($outFile);
     }
+
     public function testCanCreatePdfFromUrl()
     {
         $url = self::URL;
@@ -50,7 +55,6 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("$binary '$url' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
-
 
     // Add pages
     public function testCanAddPagesFromFile()
@@ -70,6 +74,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("$binary '$inFile' '$inFile' '$tmpFile'", $command);
         unlink($outFile);
     }
+
     public function testCanAddPagesFromHtmlString()
     {
         $outFile = $this->getOutFile();
@@ -86,6 +91,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp("#$binary '[^ ]+' '[^ ]+' '$tmpFile'#", (string) $pdf->getCommand());
         unlink($outFile);
     }
+
     public function testCanAddPagesFromUrl()
     {
         $url = self::URL;
@@ -104,7 +110,6 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         unlink($outFile);
     }
 
-
     // Cover page
     public function testCanAddCoverFromFile()
     {
@@ -122,6 +127,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("$binary cover '$inFile' '$tmpFile'", $command);
         unlink($outFile);
     }
+
     public function testCanAddCoverFromHtmlString()
     {
         $outFile = $this->getOutFile();
@@ -137,6 +143,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp("#$binary cover '[^ ]+' '$tmpFile'#", (string) $pdf->getCommand());
         unlink($outFile);
     }
+
     public function testCanAddCoverFromUrl()
     {
         $url = self::URL;
@@ -192,9 +199,13 @@ class PdfTest extends \PHPUnit_Framework_TestCase
 
         $tmpFile = $pdf->getPdfFilename();
         $this->assertFileExists($outFile);
-        $this->assertEquals("$binary --no-outline --margin-top '0' --allow '/tmp' --allow '/test' '$inFile' '$tmpFile'", (string) $pdf->getCommand());
+        $this->assertEquals(
+            "$binary --no-outline --margin-top '0' --allow '/tmp' --allow '/test' '$inFile' '$tmpFile'",
+            (string) $pdf->getCommand()
+        );
         unlink($outFile);
     }
+
     public function testCanSetGlobalOptions()
     {
         $inFile = $this->getHtmlAsset();
@@ -215,6 +226,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("$binary --no-outline --margin-top '0' '$inFile' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
+
     public function testSetPageCoverAndTocOptions()
     {
         $inFile = $this->getHtmlAsset();
@@ -249,9 +261,13 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertEquals("$binary --no-outline --margin-top '0' --header-center 'test {x} {y}' '$inFile' --no-background --zoom '1.5' --cookie 'name' 'value' --replace '{x}' 'x' --replace '{y}' '' cover '$inFile' --replace '{x}' 'a' --replace '{y}' 'b' toc --disable-dotted-lines '$tmpFile'", (string) $pdf->getCommand());
+        $this->assertEquals(
+            "$binary --no-outline --margin-top '0' --header-center 'test {x} {y}' '$inFile' --no-background --zoom '1.5' --cookie 'name' 'value' --replace '{x}' 'x' --replace '{y}' '' cover '$inFile' --replace '{x}' 'a' --replace '{y}' 'b' toc --disable-dotted-lines '$tmpFile'",
+            (string) $pdf->getCommand()
+        );
         unlink($outFile);
     }
+
     public function testCanAddHeaderAndFooterAsHtml()
     {
         $inFile = $this->getHtmlAsset();
@@ -268,7 +284,10 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary --header-html '/tmp/[^ ]+' --footer-html '/tmp/[^ ]+' '$inFile' '$tmpFile'#", (string) $pdf->getCommand());
+        $this->assertRegExp(
+            "#$binary --header-html '/tmp/[^ ]+' --footer-html '/tmp/[^ ]+' '$inFile' '$tmpFile'#",
+            (string) $pdf->getCommand()
+        );
         unlink($outFile);
     }
 
@@ -290,22 +309,32 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($pdf->saveAs($outFile));
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertEquals("xvfb-run --server-args=\"-screen 0, 1024x768x24\" $binary '$inFile' '$tmpFile'", (string) $pdf->getCommand());
+        $this->assertEquals(
+            "xvfb-run --server-args=\"-screen 0, 1024x768x24\" $binary '$inFile' '$tmpFile'",
+            (string) $pdf->getCommand()
+        );
         unlink($outFile);
     }
 
-
-
+    /**
+     * @return string
+     */
     protected function getBinary()
     {
         return '/usr/local/bin/wkhtmltopdf';
     }
 
+    /**
+     * @return string
+     */
     protected function getHtmlAsset()
     {
         return __DIR__.'/assets/test.html';
     }
 
+    /**
+     * @return string
+     */
     protected function getOutFile()
     {
         return __DIR__.'/test.pdf';
