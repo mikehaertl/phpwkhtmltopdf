@@ -1,9 +1,12 @@
 <?php
+
+namespace mikehaertl\wkhtmlto\PdfTest;
+
 use mikehaertl\wkhtmlto\Image;
 
 class ImageTest extends \PHPUnit_Framework_TestCase
 {
-    CONST URL = 'http://www.google.com/robots.txt';
+    const URL = 'http://www.google.com/robots.txt';
 
     // Create image through constructor
     public function testCanCreateImageFromFile()
@@ -21,6 +24,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("$binary '$inFile' '$tmpFile'", (string) $image->getCommand());
         unlink($outFile);
     }
+
     public function testCanCreateImageFromHtmlString()
     {
         $outFile = $this->getOutFile('png');
@@ -35,10 +39,10 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp("#$binary '[^ ]+' '$tmpFile'#", (string) $image->getCommand());
         unlink($outFile);
     }
+
     public function testCanCreateImageFromUrl()
     {
         $url = self::URL;
-        $inFile = $this->getHtmlAsset();
         $outFile = $this->getOutFile('png');
         $binary = $this->getBinary();
 
@@ -69,6 +73,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("$binary '$inFile' '$tmpFile'", (string) $image->getCommand());
         unlink($outFile);
     }
+
     public function testCanSetPageFromHtmlString()
     {
         $outFile = $this->getOutFile('png');
@@ -84,10 +89,10 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp("#$binary '[^ ]+' '$tmpFile'#", (string) $image->getCommand());
         unlink($outFile);
     }
+
     public function testCanSetPageFromUrl()
     {
         $url = self::URL;
-        $inFile = $this->getHtmlAsset();
         $outFile = $this->getOutFile('png');
         $binary = $this->getBinary();
 
@@ -124,9 +129,13 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
         $tmpFile = $image->getimageFilename();
         $this->assertFileExists($outFile);
-        $this->assertEquals("$binary --transparent --width '800' --allow '/tmp' --allow '/test' '$inFile' '$tmpFile'", (string) $image->getCommand());
+        $this->assertEquals(
+            "$binary --transparent --width '800' --allow '/tmp' --allow '/test' '$inFile' '$tmpFile'",
+            (string) $image->getCommand()
+        );
         unlink($outFile);
     }
+
     public function testCanSetOptions()
     {
         $inFile = $this->getHtmlAsset();
@@ -149,7 +158,10 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
         $tmpFile = $image->getimageFilename();
         $this->assertFileExists($outFile);
-        $this->assertEquals("$binary --transparent --width '800' --allow '/tmp' --allow '/test' '$inFile' '$tmpFile'", (string) $image->getCommand());
+        $this->assertEquals(
+            "$binary --transparent --width '800' --allow '/tmp' --allow '/test' '$inFile' '$tmpFile'",
+            (string) $image->getCommand()
+        );
         unlink($outFile);
     }
 
@@ -176,17 +188,26 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         unlink($outFile);
     }
 
-
+    /**
+     * @return string
+     */
     protected function getBinary()
     {
         return '/usr/local/bin/wkhtmltoimage';
     }
 
+    /**
+     * @return string
+     */
     protected function getHtmlAsset()
     {
         return __DIR__.'/assets/test.html';
     }
 
+    /**
+     * @param string $type
+     * @return string
+     */
     protected function getOutFile($type)
     {
         return __DIR__.'/test.'.$type;
