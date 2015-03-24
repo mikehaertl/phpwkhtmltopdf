@@ -35,6 +35,20 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp("#$binary '[^ ]+' '$tmpFile'#", (string) $pdf->getCommand());
         unlink($outFile);
     }
+    public function testCanCreatePdfFromXmlString()
+    {
+        $outFile = $this->getOutFile();
+        $binary = $this->getBinary();
+
+        $pdf = new Pdf('<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" version="1.0"></svg>');
+        $pdf->binary = $binary;
+        $this->assertTrue($pdf->saveAs($outFile));
+        $this->assertFileExists($outFile);
+
+        $tmpFile = $pdf->getPdfFilename();
+        $this->assertRegExp("#$binary '[^ ]+' '$tmpFile'#", (string) $pdf->getCommand());
+        unlink($outFile);
+    }
     public function testCanCreatePdfFromUrl()
     {
         $url = self::URL;
