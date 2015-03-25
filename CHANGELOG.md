@@ -2,7 +2,8 @@
 
 ## 2.0.2
 
- * WIP
+ * Issue #56: Fix issue with `proc_open()` on windows
+ * Add detection for XML strings
 
 ## 2.0.1
 
