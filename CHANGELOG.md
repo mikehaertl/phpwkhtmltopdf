@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.3
+
+ * WIP
+
 ## 2.0.2
 
  * Issue #56: Fix issue with `proc_open()` on windows
