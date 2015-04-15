@@ -2,7 +2,8 @@
 
 ## 2.0.3
 
- * WIP
+ * Make dependencies in `composer.json` less restrictive
+ * Remove `composer.lock` to allow for independent updates of dependencies
 
 ## 2.0.2
 
