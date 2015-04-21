@@ -102,7 +102,7 @@ class Pdf
      *
      * @param string $input either a URL, a HTML string or a PDF/HTML filename
      * @param array $options optional options for this page
-     * @return Pdf the Pdf instance for method chaining
+     * @return $this the Pdf instance for method chaining
      */
     public function addPage($input,$options=array())
     {
@@ -117,7 +117,7 @@ class Pdf
      *
      * @param string $input either a URL, a HTML string or a PDF/HTML filename
      * @param array $options optional options for the cover page
-     * @return Pdf the Pdf instance for method chaining
+     * @return $this the Pdf instance for method chaining
      */
     public function addCover($input,$options=array())
     {
@@ -131,7 +131,7 @@ class Pdf
      * Add a TOC object to the output
      *
      * @param array $options optional options for the table of contents
-     * @return Pdf the Pdf instance for method chaining
+     * @return $this the Pdf instance for method chaining
      */
     public function addToc($options=array())
     {
@@ -178,7 +178,7 @@ class Pdf
      * Set global option(s)
      *
      * @param array $options list of global PDF options to set as name/value pairs
-     * @return Pdf the Pdf instance for method chaining
+     * @return $this the Pdf instance for method chaining
      */
     public function setOptions($options=array())
     {
