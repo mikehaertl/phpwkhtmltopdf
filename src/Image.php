@@ -92,7 +92,7 @@ class Image
      * Add a page object to the output
      *
      * @param string $page either a URL, a HTML string or a PDF/HTML filename
-     * @return $this the Image instance for method chaining
+     * @return static the Image instance for method chaining
      */
     public function setPage($page)
     {
@@ -139,7 +139,7 @@ class Image
      * Set options
      *
      * @param array $options list of image options to set as name/value pairs
-     * @return $this the Image instance for method chaining
+     * @return static the Image instance for method chaining
      */
     public function setOptions($options=array())
     {
