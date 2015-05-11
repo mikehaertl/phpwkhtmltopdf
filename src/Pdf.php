@@ -65,7 +65,7 @@ class Pdf
     protected $_objects = array();
 
     /**
-     * @var mikehaertl\tmp\File the temporary PDF file
+     * @var \mikehaertl\tmp\File the temporary PDF file
      */
     protected $_tmpPdfFile;
 
@@ -227,6 +227,20 @@ class Pdf
             $this->_tmpPdfFile = new File('', '.pdf', self::TMP_PREFIX, $this->tmpDir);
         }
         return $this->_tmpPdfFile->getFileName();
+    }
+
+    /**
+     * Clean all protected proerties to be able to work with new console session.
+     */
+    public function cleanBuffer()
+    {
+        $this->_isCreated = false;
+        $this->_options = array();
+        $this->_objects = array();
+        $this->_tmpPdfFile = null;
+        $this->_tmpFiles = array();
+        $this->_command = null;
+        $this->_error = '';
     }
 
     /**
