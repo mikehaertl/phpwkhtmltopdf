@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.4
+
+ * Issue #100: Fix issue with header-/footer-html
+
 ## 2.0.3
 
  * Make dependencies in `composer.json` less restrictive

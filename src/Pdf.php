@@ -9,7 +9,7 @@ use mikehaertl\tmp\File;
  * This class is a slim wrapper around wkhtmltopdf.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @version 2.0.3
+ * @version 2.0.4-dev
  * @license http://www.opensource.org/licenses/MIT
  */
 class Pdf
@@ -280,7 +280,8 @@ class Pdf
     {
         foreach ($options as $key=>$val) {
             $urlRequired = preg_match('/^(header|footer)-html$/', $key);
-            if ($urlRequired && !(is_file($val) || preg_match('/^(https?:)?\/\//i',$val) || $val===strip_tags($val))) {
+            // We need a tmp file, if the value is neither a URL nor a file name and does not contain HTML
+            if ($urlRequired && !(preg_match('/^(https?:)?\/\//i',$val) || is_file($val) || $val===strip_tags($val))) {
                 $options[$key] = new File($val, '.html', self::TMP_PREFIX, $this->tmpDir);
             }
         }
