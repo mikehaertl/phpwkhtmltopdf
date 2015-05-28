@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.5
+
+ * WIP
+
 ## 2.0.4
 
  * Issue #100: Fix issue with header-/footer-html
@@ -20,7 +24,7 @@
 
 ## 2.0.0
 
-In this major release we have added a wrapper for wkhtmltopdf and cleaned
+In this major release we have added a wrapper for wkhtmltoimage and cleaned
 up the code and interface. We also introduced namespaces and Travis testing.
 Please have a look at the README.md for the new API.
 
