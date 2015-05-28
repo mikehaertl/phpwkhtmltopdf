@@ -279,10 +279,13 @@ class Pdf
     protected function processOptions($options=array())
     {
         foreach ($options as $key=>$val) {
-            $urlRequired = preg_match('/^(header|footer)-html$/', $key);
-            // We need a tmp file, if the value is neither a URL nor a file name and does not contain HTML
-            if ($urlRequired && !(preg_match('/^(https?:)?\/\//i',$val) || is_file($val) || $val===strip_tags($val))) {
-                $options[$key] = new File($val, '.html', self::TMP_PREFIX, $this->tmpDir);
+            // header-/footer-html expect a URL or a file name, so we need to create a tmp file for HTML content
+            if (is_string($val) && preg_match('/^(header|footer)-html$/', $key)) {
+                defined('PHP_MAXPATHLEN') || define('PHP_MAXPATHLEN', 255);
+                $isFile = (strlen($val) <= PHP_MAXPATHLEN) ? is_file($val) : false;
+                if (!($isFile || preg_match('/^(https?:)?\/\//i',$val) || $val===strip_tags($val))) {
+                    $options[$key] = new File($val, '.html', self::TMP_PREFIX, $this->tmpDir);
+                }
             }
         }
         return $options;
