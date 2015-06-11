@@ -83,7 +83,7 @@ class Command extends BaseCommand
                     }
                 }
             } else {
-                $this->addArg("--$key", $val);
+                $this->addArg($key{0} === "-" ? $key : "--$key", $val);
             }
         }
     }
