@@ -20,6 +20,9 @@ Install the package through [composer](http://getcomposer.org):
 composer require mikehaertl/phpwkhtmltopdf
 ```
 
+Make sure, that you include the composer [autoloader](https://getcomposer.org/doc/01-basic-usage.md#autoloading)
+somewhere in your codebase.
+
 ### Single page PDF
 
 ```php
