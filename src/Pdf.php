@@ -175,6 +175,19 @@ class Pdf
     }
 
     /**
+     * view raw PDF contents
+     * 
+     * @return mixed PDF contents or false if PDF was not created successfully
+     */
+    public function raw()
+    {
+        if (!$this->_isCreated && !$this->createPdf()) {
+            return false;
+        }
+        return file_get_contents($this->_tmpPdfFile->getFileName());
+    }
+
+    /**
      * Set global option(s)
      *
      * @param array $options list of global PDF options to set as name/value pairs
