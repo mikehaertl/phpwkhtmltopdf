@@ -175,6 +175,18 @@ class Pdf
     }
 
     /**
+     * Get the raw PDF contents. (triggers PDF creation).
+     * @return string|false The PDF as a string or false if the PDF wasn't created successfully.
+     */
+    public function __toString()
+    {
+        if (!$this->_isCreated && !$this->createPdf()) {
+            return false;
+        }
+        return file_get_contents($this->_tmpPdfFile->getFileName());
+    }
+
+    /**
      * Set global option(s)
      *
      * @param array $options list of global PDF options to set as name/value pairs
