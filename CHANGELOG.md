@@ -1,8 +1,9 @@
 # CHANGELOG
 
-## 2.0.5
+## 2.1.0
 
- * WIP
+ * We now follow [semver](http://semver.org/)!
+ * Issue #112: Add toString() to get raw PDF content as string
 
 ## 2.0.4
 

@@ -9,7 +9,7 @@ use mikehaertl\tmp\File;
  * This class is a slim wrapper around wkhtmltopdf.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @version 2.0.5-dev
+ * @version 2.1.0
  * @license http://www.opensource.org/licenses/MIT
  */
 class Pdf
@@ -175,10 +175,10 @@ class Pdf
     }
 
     /**
-     * Get the raw PDF contents. (triggers PDF creation).
-     * @return string|false The PDF as a string or false if the PDF wasn't created successfully.
+     * Get the raw PDF contents (triggers PDF creation).
+     * @return string|bool The PDF content as a string or `false` if the PDF wasn't created successfully.
      */
-    public function __toString()
+    public function toString()
     {
         if (!$this->_isCreated && !$this->createPdf()) {
             return false;

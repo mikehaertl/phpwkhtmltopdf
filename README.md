@@ -44,29 +44,27 @@ $pdf->saveAs('/tmp/new.pdf');
 use mikehaertl\wkhtmlto\Pdf;
 
 $pdf = new Pdf;
-$pdf->addPage('/home/joe/page.html');
+$pdf->addPage('/path/to/page.html');
 $pdf->addPage('<html>....</html>');
-$pdf->addPage('http://google.com');
+$pdf->addPage('http://www.example.com');
 
 // Add a cover (same sources as above are possible)
-$pdf->addCover('mycover.html');
+$pdf->addCover('/path/to/mycover.html');
 
 // Add a Table of contents
 $pdf->addToc();
 
 // Save the PDF
-$pdf->saveAs('/tmp/new.pdf');
+$pdf->saveAs('/path/to/report.pdf');
 
 // ... or send to client for inline display
 $pdf->send();
 
 // ... or send to client as file download
-$pdf->send('test.pdf');
+$pdf->send('report.pdf');
 
 // ... or you can get the raw pdf as a string
-if (($pdfText = (string) $pdf) === false)
-    echo 'Could not create PDF. '.$pdf->getError();
-
+$content = $pdf->toString();
 ```
 
 ### Creating an image
@@ -75,14 +73,14 @@ if (($pdfText = (string) $pdf) === false)
 use mikehaertl\wkhtmlto\Image;
 
 // You can pass a filename, a HTML string or an URL to the constructor
-$image = new Image('/home/joe/page.html');
-$image->saveAs('/tmp/new.png');
+$image = new Image('/path/to/page.html');
+$image->saveAs('/path/to/page.png');
 
 // ... or send to client for inline display
 $image->send();
 
 // ... or send to client as file download
-$image->send('test.png');
+$image->send('page.png');
 ```
 
 ## Setting options
@@ -105,8 +103,8 @@ $options = array(
 
     // Repeatable options with single argument
     'run-script' => array(
-        'local1.js',
-        'local2.js',
+        '/path/to/local1.js',
+        '/path/to/local2.js',
     ),
 
     // Repeatable options with 2 arguments
@@ -137,16 +135,16 @@ $image = new Image($options);   // Set image options
 $image->setOptions($options);   // Set image options (alternative)
 ```
 
-### Special global options
+### Wrapper options
 
-There are some special options to configure the wrapper itself. They can be passed to the constructor
-or set via `setOptions()`:
+The wrapper itself is configured by the following options that can be passed
+to the constructor or set via `setOptions()`:
 
- * `binary`: Path or filename of the `wkhtmltopdf` shell command. Default is `wkhtmltopdf`.
- * `commandOptions`: Options to pass to `mikehaertl\shellcommand\Command`.
-    See [php-shellcommand](https://github.com/mikehaertl/php-shellcommand).
+ * `binary`: Full path to the `wkhtmltopdf` command. Default is `wkhtmltopdf` which assumes that the
+   command is in your shell's search path.
+ * `commandOptions`: Options to pass to https://github.com/mikehaertl/php-shellcommand.
  * `tmpDir`: Path to tmp directory. Defaults to the PHP temp dir.
- * `ignoreWarnings`: Whether to ignore any errors if a PDF file was still created. Default is false.
+ * `ignoreWarnings`: Whether to ignore any errors if a PDF file was still created. Default is `false`.
  * `version9`: Whether to use command line syntax for older wkhtmltopdf versions.
 
 In addition to the `binary`, `commandOptions`, `tmpDir` and `ignorWarnings` options above,
@@ -156,11 +154,16 @@ the `Image` class also has a `type` option:
 
 ## Error handling
 
-`send()` and `saveAs()` will return `false` on error. In this case the detailed error message is
+`send()`, `saveAs()` and `toString()` will return `false` on error. In this case the detailed error message is
 available from `getError()`:
 
 ```php
 if (!$pdf->send()) {
+    throw new Exception('Could not create PDF: '.$pdf->getError());
+}
+
+$content = $pdf->toString();
+if ($content === false) {
     throw new Exception('Could not create PDF: '.$pdf->getError());
 }
 ```
@@ -168,17 +171,17 @@ if (!$pdf->send()) {
 ## Note for Windows users
 
 If you use double quotes (`"`) or percent signs (`%`) as option values, they may get converted to spaces.
-In this case you can disable argument escaping in the `Command`. There are also two interesting options to
-`proc_open()` that you may want to use:
+In this case you can disable argument escaping in the [command](https://github.com/mikehaertl/php-shellcommand).
+There are also two interesting options to `proc_open()` that you may want to use:
 
 ```php
 $pdf = new Pdf(array(
     'commandOptions' => array(
         'escapeArgs' => false,
         'procOptions' => array(
-            // This will bypass the cmd.exe which seems to be recommended
+            // This will bypass the cmd.exe which seems to be recommended on Windows
             'bypass_shell' => true,
-            // Try this if you get weird errors
+            // Also worth a try if you get unexplainable errors
             'suppress_errors' => true,
         ),
     ),
@@ -280,12 +283,12 @@ $pdf = new Pdf(array(
 
     // Default page options
     'disable-smart-shrinking',
-    'user-style-sheet' => 'pdf.css',
+    'user-style-sheet' => '/path/to/pdf.css',
 ));
 
 // Add a page. To override above page defaults, you could add
 // another $options array as second argument.
-$pdf->addPage('demo.html');
+$pdf->addPage('/path/to/demo.html');
 
 $pdf->send();
 ```

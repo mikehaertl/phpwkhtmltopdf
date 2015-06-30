@@ -196,7 +196,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($pdf->saveAs($outFile));
         $this->assertFileExists($outFile);
 
-        $this->assertEquals(file_get_contents($outFile), (string)$pdf); // Test __toString();
+        $this->assertEquals(file_get_contents($outFile), $pdf->toString());
         unlink($outFile);
     }
 
