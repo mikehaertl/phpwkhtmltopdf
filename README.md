@@ -62,6 +62,11 @@ $pdf->send();
 
 // ... or send to client as file download
 $pdf->send('test.pdf');
+
+// ... or you can get the raw pdf as a string
+if (($pdfText = (string) $pdf) === false)
+    echo 'Could not create PDF. '.$pdf->getError();
+
 ```
 
 ### Creating an image

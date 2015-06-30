@@ -185,6 +185,21 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         unlink($outFile);
     }
 
+    public function testToString()
+    {
+        $outFile = $this->getOutFile();
+        $binary = $this->getBinary();
+
+        $pdf = new Pdf('<html><h1>Test</h1></html>');
+        $pdf->binary = $binary;
+
+        $this->assertTrue($pdf->saveAs($outFile));
+        $this->assertFileExists($outFile);
+
+        $this->assertEquals(file_get_contents($outFile), (string)$pdf); // Test __toString();
+        unlink($outFile);
+    }
+
     // Options
     public function testCanPassGlobalOptionsInConstructor()
     {
