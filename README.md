@@ -29,12 +29,12 @@ somewhere in your codebase.
 use mikehaertl\wkhtmlto\Pdf;
 
 // You can pass a filename, a HTML string or an URL to the constructor
-$pdf = new Pdf('/home/joe/page.html');
+$pdf = new Pdf('/path/to/page.html');
 
 // On some systems you may have to set the binary path.
 // $pdf->binary = 'C:\...';
 
-$pdf->saveAs('/tmp/new.pdf');
+$pdf->saveAs('/path/to/page.pdf');
 ```
 
 ### Multi page PDF with Toc and Cover page
