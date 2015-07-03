@@ -152,6 +152,20 @@ the `Image` class also has a `type` option:
 
  * `type`: The image type. Default is `png`. You can also use `jpg` or `bmp`.
 
+`commandOptions` can be used to set environment variables for `wkhtmltopdf`. For example, if you
+want to pass UTF-8 encoded arguments, you may have to set the `LANG` environment variable:
+
+```php
+$pdf = new Pdf(array(
+    'commandOptions' => array(
+        'procEnv' => array(
+            // Check the output of 'locale' on your system to find supported languages
+            'LANG' => 'en_US.utf-8',
+        ),
+    ),
+));
+```
+
 ## Error handling
 
 `send()`, `saveAs()` and `toString()` will return `false` on error. In this case the detailed error message is
