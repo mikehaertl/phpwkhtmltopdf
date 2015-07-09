@@ -261,9 +261,12 @@ $pdf = new Pdf(array(
 It's better to start a Xvfb process once and reuse it for all your PHP requests
 (thanks to Larry Williamson for [the original idea](https://coderwall.com/p/tog9eq)).
 This requires that you have root access to your machine as you have to add a startup script
-for that process. We have provided an example script for Ubuntu [here](https://gist.github.com/eusonlito/7889622)
-(Thanks eusonlito). You can put it to `/etc/init.d/xvfb` and add it to your startup files with
-`update-rc.d xvfb defaults 10`. It should be easy to adapt the script for other Linux versions.
+for that process. We have provided an example [init script](https://gist.github.com/eusonlito/7889622)
+for Ubuntu (thanks eusonlito). You can put it to `/etc/init.d/xvfb` and add it to your startup files with
+`update-rc.d xvfb defaults 10`.
+
+If your system is based on systemd [this config](https://gist.github.com/nkm/91006178753df6f503c1)
+should help (thanks nkm).
 
 If your `Xvfb` process is running, you just have to tell the class to use this X display for
 rendering. This is done via an environment variable.
