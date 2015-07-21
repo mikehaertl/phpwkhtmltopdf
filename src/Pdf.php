@@ -15,7 +15,7 @@ use mikehaertl\tmp\File;
 class Pdf
 {
     // Regular expression to detect HTML strings
-    const REGEX_HTML = '/<html/i';
+    const REGEX_HTML = '/<(?:!doctype )?html/i';
 
     // Regular expression to detect XML strings
     const REGEX_XML = '/<\??xml/i';
@@ -65,7 +65,7 @@ class Pdf
     protected $_objects = array();
 
     /**
-     * @var mikehaertl\tmp\File the temporary PDF file
+     * @var \mikehaertl\tmp\File the temporary PDF file
      */
     protected $_tmpPdfFile;
 
@@ -271,7 +271,7 @@ class Pdf
 
     /**
      * @param string $input
-     * @return mikehaertl\tmp\File|string a File object if the input is a html string. The unchanged input otherwhise.
+     * @return \mikehaertl\tmp\File|string a File object if the input is a html string. The unchanged input otherwhise.
      */
     protected function processInput($input)
     {
