@@ -52,7 +52,7 @@ class Image
     protected $_isCreated = false;
 
     /**
-     * @var mikehaertl\tmp\File|string the page input or a File instance for HTML string inputs
+     * @var \mikehaertl\tmp\File|string the page input or a File instance for HTML string inputs
      */
     protected $_page;
 
@@ -62,7 +62,7 @@ class Image
     protected $_options = array();
 
     /**
-     * @var mikehaertl\tmp\File the temporary image file
+     * @var \mikehaertl\tmp\File the temporary image file
      */
     protected $_tmpImageFile;
 
@@ -112,6 +112,7 @@ class Image
             return false;
         }
         if (!$this->_tmpImageFile->saveAs($filename)) {
+            $tmpFile = $this->_tmpImageFile->getFileName();
             $this->_error = "Could not copy image from tmp location '$tmpFile' to '$filename'";
             return false;
         }
@@ -191,6 +192,7 @@ class Image
 
     /**
      * @return string the mime type for the current image
+     * @throws \Exception
      */
     public function getMimeType()
     {
@@ -201,7 +203,7 @@ class Image
         } elseif ($this->type==='bmp') {
             return 'image/bmp';
         } else {
-            throw new \Excpetion('Invalid image type');
+            throw new \Exception('Invalid image type');
         }
     }
 
