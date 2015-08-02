@@ -34,7 +34,9 @@ $pdf = new Pdf('/path/to/page.html');
 // On some systems you may have to set the binary path.
 // $pdf->binary = 'C:\...';
 
-$pdf->saveAs('/path/to/page.pdf');
+if (!$pdf->saveAs('/path/to/page.pdf')) {
+    echo $pdf->getError();
+}
 ```
 
 ### Multi page PDF with Toc and Cover page
