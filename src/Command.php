@@ -27,9 +27,9 @@ class Command extends BaseCommand
     public $xvfbRunBinary = 'xvfb-run';
 
     /**
-     * @var string options to pass to the xfvb-run command. Default is `--server-args="-screen 0, 1024x768x24"`.
+     * @var string options to pass to the xfvb-run command. Default is `-a --server-args="-screen 0, 1024x768x24"`.
      */
-    public $xvfbRunOptions = '--server-args="-screen 0, 1024x768x24"';
+    public $xvfbRunOptions = '-a --server-args="-screen 0, 1024x768x24"';
 
     /**
      * @param array $args args to add to the command. These can be:
