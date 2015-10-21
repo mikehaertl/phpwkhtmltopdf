@@ -9,7 +9,7 @@ use mikehaertl\tmp\File;
  * This class is a slim wrapper around wkhtmltoimage.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @version 2.1.0
+ * @version 2.1.1
  * @license http://www.opensource.org/licenses/MIT
  */
 class Image
