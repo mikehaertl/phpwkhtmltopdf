@@ -172,7 +172,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
         $tmpFile = $image->getImageFilename();
         $command = (string)$image->getCommand();
-        $this->assertEquals("xvfb-run --server-args=\"-screen 0, 1024x768x24\" $binary '$inFile' '$tmpFile'", $command);
+        $this->assertEquals("xvfb-run -a --server-args=\"-screen 0, 1024x768x24\" $binary '$inFile' '$tmpFile'", $command);
         unlink($outFile);
     }
 

@@ -319,7 +319,7 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($pdf->saveAs($outFile));
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertEquals("xvfb-run --server-args=\"-screen 0, 1024x768x24\" $binary '$inFile' '$tmpFile'", (string) $pdf->getCommand());
+        $this->assertEquals("xvfb-run -a --server-args=\"-screen 0, 1024x768x24\" $binary '$inFile' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
 
