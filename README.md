@@ -31,7 +31,7 @@ use mikehaertl\wkhtmlto\Pdf;
 // You can pass a filename, a HTML string or an URL to the constructor
 $pdf = new Pdf('/path/to/page.html');
 
-// On some systems you may have to set the binary path.
+// On some systems you may have to set the path to the wkhtmltopdf executable
 // $pdf->binary = 'C:\...';
 
 if (!$pdf->saveAs('/path/to/page.pdf')) {
