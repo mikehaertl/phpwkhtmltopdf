@@ -9,11 +9,15 @@ use mikehaertl\tmp\File;
  * This class is a slim wrapper around wkhtmltopdf.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @version 2.1.1
+ * @version 2.2.0-dev
  * @license http://www.opensource.org/licenses/MIT
  */
 class Pdf
 {
+    // Type hints for `addPage()` and `addCover()`
+    const TYPE_HTML = 'html';
+    const TYPE_XML = 'xml';
+
     // Regular expression to detect HTML strings
     const REGEX_HTML = '/<(?:!doctype )?html/i';
 
@@ -102,12 +106,14 @@ class Pdf
      *
      * @param string $input either a URL, a HTML string or a PDF/HTML filename
      * @param array $options optional options for this page
+     * @param string|null $type a type hint if the input is a string of known type. This can either be
+     * `TYPE_HTML` or `TYPE_XML`. If `null` (default) the type is auto detected from the string content.
      * @return static the Pdf instance for method chaining
      */
-    public function addPage($input,$options=array())
+    public function addPage($input, $options=array(), $type=null)
     {
         $options = $this->processOptions($options);
-        $options['inputArg'] = $this->processInput($input);
+        $options['inputArg'] = $this->processInput($input, $type);
         $this->_objects[] = $options;
         return $this;
     }
@@ -117,12 +123,14 @@ class Pdf
      *
      * @param string $input either a URL, a HTML string or a PDF/HTML filename
      * @param array $options optional options for the cover page
+     * @param string|null $type a type hint if the input is a string of known type. This can either be
+     * `TYPE_HTML` or `TYPE_XML`. If `null` (default) the type is auto detected from the string content.
      * @return static the Pdf instance for method chaining
      */
-    public function addCover($input,$options=array())
+    public function addCover($input, $options=array(), $type=null)
     {
         $options['input'] = ($this->version9 ? '--' : '').'cover';
-        $options['inputArg'] = $this->processInput($input);
+        $options['inputArg'] = $this->processInput($input, $type);
         $this->_objects[] = $options;
         return $this;
     }
@@ -271,13 +279,15 @@ class Pdf
 
     /**
      * @param string $input
-     * @return \mikehaertl\tmp\File|string a File object if the input is a html string. The unchanged input otherwhise.
+     * @param string|null $type a type hint if the input is a string of known type. This can either be
+     * `TYPE_HTML` or `TYPE_XML`. If `null` (default) the type is auto detected from the string content.
+     * @return \mikehaertl\tmp\File|string a File object if the input is a HTML or XML string. The unchanged input otherwhise.
      */
-    protected function processInput($input)
+    protected function processInput($input, $type=null)
     {
-        if (preg_match(self::REGEX_HTML, $input)) {
+        if ($type===self::TYPE_HTML || $type===null && preg_match(self::REGEX_HTML, $input)) {
             return $this->_tmpFiles[] = new File($input, '.html', self::TMP_PREFIX, $this->tmpDir);
-        } elseif (preg_match(self::REGEX_XML, $input)) {
+        } elseif ($type===self::TYPE_XML || preg_match(self::REGEX_XML, $input)) {
             return $this->_tmpFiles[] = new File($input, '.xml', self::TMP_PREFIX, $this->tmpDir);
         } else {
             return $input;
