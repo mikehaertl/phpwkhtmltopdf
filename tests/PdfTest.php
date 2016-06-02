@@ -117,6 +117,55 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("$binary '$url' '$url' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
+    public function testCanAddPageFromHtmlString()
+    {
+        $outFile = $this->getOutFile();
+        $binary = $this->getBinary();
+
+        $pdf = new Pdf;
+        $pdf->binary = $binary;
+        $pdf->addPage('<html><h1>test</h1></html>');
+        $pdf->saveAs($outFile);
+        $this->assertRegexp('/tmp_wkhtmlto_pdf_.*?\.html/', $pdf->getCommand()->getExecCommand());
+        unlink($outFile);
+    }
+    public function testCanAddPageFromXmlString()
+    {
+        $outFile = $this->getOutFile();
+        $binary = $this->getBinary();
+
+        $pdf = new Pdf;
+        $pdf->binary = $binary;
+        $pdf->addPage('<xml>test</xml>');
+        $pdf->saveAs($outFile);
+        $this->assertRegexp('/tmp_wkhtmlto_pdf_.*?\.xml/', $pdf->getCommand()->getExecCommand());
+        unlink($outFile);
+    }
+    public function testCanAddHtmlPageFromStringByType()
+    {
+        $outFile = $this->getOutFile();
+        $binary = $this->getBinary();
+
+        $pdf = new Pdf;
+        $pdf->binary = $binary;
+        $pdf->addPage('Test', array(), Pdf::TYPE_HTML);
+        $pdf->saveAs($outFile);
+        $this->assertRegexp('/tmp_wkhtmlto_pdf_.*?\.html/', $pdf->getCommand()->getExecCommand());
+        unlink($outFile);
+    }
+    public function testCanAddXmlPageFromStringByType()
+    {
+        $outFile = $this->getOutFile();
+        $binary = $this->getBinary();
+
+        $pdf = new Pdf;
+        $pdf->binary = $binary;
+        $pdf->addPage('Test', array(), Pdf::TYPE_XML);
+        $pdf->saveAs($outFile);
+        $this->assertRegexp('/tmp_wkhtmlto_pdf_.*?\.xml/', $pdf->getCommand()->getExecCommand());
+        unlink($outFile);
+    }
+
 
 
     // Cover page
