@@ -149,7 +149,7 @@ to the constructor, set as object properties or via `setOptions()`:
  * `ignoreWarnings`: Whether to ignore any errors if a PDF file was still created. Default is `false`.
  * `version9`: Whether to use command line syntax for older wkhtmltopdf versions.
 
-In addition to the `binary`, `commandOptions`, `tmpDir` and `ignorWarnings` options above,
+In addition to the `binary`, `commandOptions`, `tmpDir` and `ignoreWarnings` options above,
 the `Image` class also has a `type` option:
 
  * `type`: The image type. Default is `png`. You can also use `jpg` or `bmp`.
