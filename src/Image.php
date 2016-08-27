@@ -77,7 +77,7 @@ class Image
     protected $_error = '';
 
     /**
-     * @param array|string $options global options for wkhtmltoimage or page URL, HTML or PDF/HTML filename
+     * @param array|string $options global options for wkhtmltoimage, a page URL, a HTML string or a filename
      */
     public function __construct($options=null)
     {
@@ -91,7 +91,7 @@ class Image
     /**
      * Add a page object to the output
      *
-     * @param string $page either a URL, a HTML string or a PDF/HTML filename
+     * @param string $page either a URL, a HTML string or a filename
      * @return static the Image instance for method chaining
      */
     public function setPage($page)

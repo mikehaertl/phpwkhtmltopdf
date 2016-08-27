@@ -90,7 +90,7 @@ class Pdf
     protected $_error = '';
 
     /**
-     * @param array|string $options global options for wkhtmltopdf or page URL, HTML or PDF/HTML filename
+     * @param array|string $options global options for wkhtmltopdf, a page URL, a HTML string or a filename
      */
     public function __construct($options=null)
     {
@@ -104,7 +104,7 @@ class Pdf
     /**
      * Add a page object to the output
      *
-     * @param string $input either a URL, a HTML string or a PDF/HTML filename
+     * @param string $input either a URL, a HTML string or a filename
      * @param array $options optional options for this page
      * @param string|null $type a type hint if the input is a string of known type. This can either be
      * `TYPE_HTML` or `TYPE_XML`. If `null` (default) the type is auto detected from the string content.
@@ -121,7 +121,7 @@ class Pdf
     /**
      * Add a cover page object to the output
      *
-     * @param string $input either a URL, a HTML string or a PDF/HTML filename
+     * @param string $input either a URL, a HTML string or a filename
      * @param array $options optional options for the cover page
      * @param string|null $type a type hint if the input is a string of known type. This can either be
      * `TYPE_HTML` or `TYPE_XML`. If `null` (default) the type is auto detected from the string content.
