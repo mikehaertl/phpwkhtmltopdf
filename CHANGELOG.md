@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.2.1
+
+ * Issue #219: Make `header-html` and `footer-html` also work for Toc and cover page
+
 ## 2.2.0
 
  * Add a `$type` parameter to `addPage()` and `addToc()` (#169)

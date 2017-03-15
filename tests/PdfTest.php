@@ -349,6 +349,35 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp("#$binary --header-html '/tmp/[^ ]+' --footer-html '/tmp/[^ ]+' '$inFile' '$tmpFile'#", (string) $pdf->getCommand());
         unlink($outFile);
     }
+    public function testCanAddHeaderAndFooterAsHtmlToPagesAndCoverAndToc()
+    {
+        $inFile = $this->getHtmlAsset();
+        $outFile = $this->getOutFile();
+        $binary = $this->getBinary();
+
+        $pdf = new Pdf(array(
+            'binary' => $binary,
+        ));
+        $this->assertInstanceOf('mikehaertl\wkhtmlto\Pdf', $pdf->addPage('<html>test</html>', array(
+            'header-html' => '<h1>Page Header</h1>',
+            'footer-html' => '<h1>Page Footer</h1>',
+        )));
+        $this->assertInstanceOf('mikehaertl\wkhtmlto\Pdf', $pdf->addCover($inFile, array(
+            'header-html' => '<h1>Cover Header</h1>',
+            'footer-html' => '<h1>Cover Footer</h1>',
+        )));
+        $this->assertInstanceOf('mikehaertl\wkhtmlto\Pdf', $pdf->addToc(array(
+            'header-html' => '<h1>Toc Header</h1>',
+            'footer-html' => '<h1>Toc Footer</h1>',
+        )));
+        $this->assertTrue($pdf->saveAs($outFile));
+        $this->assertFileExists($outFile);
+
+        $tmpFile = $pdf->getPdfFilename();
+        $this->assertRegExp("#$binary '/tmp/[^ ]+\.html' --header-html '/tmp/[^ ]+\.html' --footer-html '/tmp/[^ ]+\.html' cover '$inFile' --header-html '/tmp/[^ ]+\.html' --footer-html '/tmp/[^ ]+\.html' toc --header-html '/tmp/[^ ]+\.html' --footer-html '/tmp/[^ ]+\.html' '$tmpFile'#", (string) $pdf->getCommand());
+        unlink($outFile);
+    }
+
 
     // Xvfb
     public function testCanUseXvfbRun()

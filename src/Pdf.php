@@ -9,7 +9,7 @@ use mikehaertl\tmp\File;
  * This class is a slim wrapper around wkhtmltopdf.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @version 2.2.0
+ * @version 2.2.1-dev
  * @license http://www.opensource.org/licenses/MIT
  */
 class Pdf
@@ -112,9 +112,8 @@ class Pdf
      */
     public function addPage($input, $options=array(), $type=null)
     {
-        $options = $this->processOptions($options);
         $options['inputArg'] = $this->processInput($input, $type);
-        $this->_objects[] = $options;
+        $this->_objects[] = $this->processOptions($options);
         return $this;
     }
 
@@ -131,7 +130,7 @@ class Pdf
     {
         $options['input'] = ($this->version9 ? '--' : '').'cover';
         $options['inputArg'] = $this->processInput($input, $type);
-        $this->_objects[] = $options;
+        $this->_objects[] = $this->processOptions($options);
         return $this;
     }
 
@@ -144,7 +143,7 @@ class Pdf
     public function addToc($options=array())
     {
         $options['input'] = ($this->version9 ? '--' : '')."toc";
-        $this->_objects[] = $options;
+        $this->_objects[] = $this->processOptions($options);
         return $this;
     }
 
