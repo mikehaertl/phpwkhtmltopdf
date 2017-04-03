@@ -248,6 +248,20 @@ class Pdf
     }
 
     /**
+     * Clean all protected proerties to be able to work with new console session.
+     */
+    public function cleanBuffer()
+    {
+        $this->_isCreated = false;
+        $this->_options = array();
+        $this->_objects = array();
+        $this->_tmpPdfFile = null;
+        $this->_tmpFiles = array();
+        $this->_command = null;
+        $this->_error = '';
+    }
+
+    /**
      * Run the Command to create the tmp PDF file
      *
      * @return bool whether creation was successful
