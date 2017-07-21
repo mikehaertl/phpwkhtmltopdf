@@ -23,6 +23,9 @@ class Pdf
     // Regular expression to detect XML strings
     const REGEX_XML = '/<\??xml/i';
 
+    // Regular expression to detect options that expect an URL or a file name, so we need to create a tmp file for the content.
+    const REGEX_OPTS_TMPFILE = '/^((header|footer)-html|(xsl|user)-style-sheet)$/i';
+
     // prefix for tmp files
     const TMP_PREFIX = 'tmp_wkhtmlto_pdf_';
 
@@ -300,7 +303,7 @@ class Pdf
     {
         foreach ($options as $key=>$val) {
             // header-/footer-html, xsl-style-sheet and user-style-sheet expect an URL or a file name, so we need to create a tmp file for the content
-            if (is_string($val) && preg_match('/^((header|footer)-html|xsl-style-sheet|user-style-sheet)$/', $key) ) {
+            if (is_string($val) && preg_match(self::REGEX_OPTS_TMPFILE, $key) ) {
                 defined('PHP_MAXPATHLEN') || define('PHP_MAXPATHLEN', 255);
                 $isFile = (strlen($val) <= PHP_MAXPATHLEN) ? is_file($val) : false;
                 if (!($isFile || preg_match('/^(https?:)?\/\//i',$val) || $val===strip_tags($val))) {
