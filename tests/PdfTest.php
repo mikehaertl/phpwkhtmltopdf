@@ -1,7 +1,7 @@
 <?php
 use mikehaertl\wkhtmlto\Pdf;
 
-class PdfTest extends \PHPUnit_Framework_TestCase
+class PdfTest extends \PHPUnit\Framework\TestCase
 {
     CONST URL = 'http://www.google.com/robots.txt';
 
