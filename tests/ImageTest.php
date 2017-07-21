@@ -1,7 +1,7 @@
 <?php
 use mikehaertl\wkhtmlto\Image;
 
-class ImageTest extends \PHPUnit_Framework_TestCase
+class ImageTest extends \PHPUnit\Framework\TestCase
 {
     CONST URL = 'http://www.google.com/robots.txt';
 
