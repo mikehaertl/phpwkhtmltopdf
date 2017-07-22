@@ -6,7 +6,7 @@ use mikehaertl\tmp\File;
 /**
  * Pdf
  *
- * This class is a slim wrapper around wkhtmltoimage.
+ * This class is a slim wrapper around `wkhtmltoimage`.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
  * @license http://www.opensource.org/licenses/MIT
@@ -20,13 +20,14 @@ class Image
     const TMP_PREFIX = 'tmp_wkhtmlto_pdf_';
 
     /**
-     * @var string the name of the `wkhtmltoimage` binary. Default is `wkhtmltoimage`. You can also
-     * configure a full path here.
+     * @var string the name of the `wkhtmltoimage` binary. Default is
+     * `wkhtmltoimage`. You can also configure a full path here.
      */
     public $binary = 'wkhtmltoimage';
 
     /**
-     * @var string the image type. Default is 'png'. Other options are 'jpg' and 'bmp'.
+     * @var string the image type. Default is 'png'. Other options are 'jpg'
+     * and 'bmp'.
      */
     public $type = 'png';
 
@@ -36,12 +37,14 @@ class Image
     public $commandOptions = array();
 
     /**
-     * @var string|null the directory to use for temporary files. If null (default) the dir is autodetected.
+     * @var string|null the directory to use for temporary files. If `null`
+     * (default) the dir is autodetected.
      */
     public $tmpDir;
 
     /**
-     * @var bool whether to ignore any errors if some PDF file was still created. Default is false.
+     * @var bool whether to ignore any errors if some PDF file was still
+     * created. Default is `false`.
      */
     public $ignoreWarnings = false;
 
@@ -51,12 +54,14 @@ class Image
     protected $_isCreated = false;
 
     /**
-     * @var \mikehaertl\tmp\File|string the page input or a File instance for HTML string inputs
+     * @var \mikehaertl\tmp\File|string the page input or a `File` instance for
+     * HTML string inputs
      */
     protected $_page;
 
     /**
-     * @var array options for wkhtmltoimage as array('--opt1', '--opt2'=>'val', ...)
+     * @var array options for `wkhtmltoimage` as `['--opt1', '--opt2' => 'val',
+     * ...]`
      */
     protected $_options = array();
 
@@ -76,9 +81,10 @@ class Image
     protected $_error = '';
 
     /**
-     * @param array|string $options global options for wkhtmltoimage, a page URL, a HTML string or a filename
+     * @param array|string $options global options for wkhtmltoimage, a page
+     * URL, a HTML string or a filename
      */
-    public function __construct($options=null)
+    public function __construct($options = null)
     {
         if (is_array($options)) {
             $this->setOptions($options);
@@ -119,14 +125,17 @@ class Image
     }
 
     /**
-     * Send image to client, either inline or as download (triggers image creation)
+     * Send image to client, either inline or as download (triggers image
+     * creation)
      *
-     * @param string|null $filename the filename to send. If empty, the PDF is streamed inline. Note, that
-     * the file extension must match what you configured as $type (png, jpg, ...).
-     * @param bool $inline whether to force inline display of the image, even if filename is present.
+     * @param string|null $filename the filename to send. If empty, the PDF is
+     * streamed inline. Note, that the file extension must match what you
+     * configured as $type (png, jpg, ...).
+     * @param bool $inline whether to force inline display of the image, even
+     * if filename is present.
      * @return bool whether image was created successfully
      */
-    public function send($filename=null,$inline=false)
+    public function send($filename = null,$inline = false)
     {
         if (!$this->_isCreated && !$this->createImage()) {
             return false;
@@ -141,9 +150,9 @@ class Image
      * @param array $options list of image options to set as name/value pairs
      * @return static the Image instance for method chaining
      */
-    public function setOptions($options=array())
+    public function setOptions($options = array())
     {
-        foreach ($options as $key=>$val) {
+        foreach ($options as $key => $val) {
             if (is_int($key)) {
                 $this->_options[] = $val;
             } elseif ($key[0]!=='_' && property_exists($this, $key)) {
@@ -160,7 +169,7 @@ class Image
      */
     public function getCommand()
     {
-        if ($this->_command===null) {
+        if ($this->_command === null) {
             $options = $this->commandOptions;
             if (!isset($options['command'])) {
                 $options['command'] = $this->binary;
@@ -183,7 +192,7 @@ class Image
      */
     public function getImageFilename()
     {
-        if ($this->_tmpImageFile===null) {
+        if ($this->_tmpImageFile === null) {
             $this->_tmpImageFile = new File('', '.'.$this->type, self::TMP_PREFIX);
         }
         return $this->_tmpImageFile->getFileName();
@@ -195,11 +204,11 @@ class Image
      */
     public function getMimeType()
     {
-        if ($this->type==='jpg') {
+        if ($this->type === 'jpg') {
             return 'image/jpeg';
-        } elseif ($this->type==='png') {
+        } elseif ($this->type === 'png') {
             return 'image/png';
-        } elseif ($this->type==='bmp') {
+        } elseif ($this->type === 'bmp') {
             return 'image/bmp';
         } else {
             throw new \Exception('Invalid image type');
