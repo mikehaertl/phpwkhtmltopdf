@@ -102,6 +102,21 @@ class ImageTest extends \PHPUnit\Framework\TestCase
         unlink($outFile);
     }
 
+    public function testToString()
+    {
+        $outFile = $this->getOutFile('png');
+        $binary = $this->getBinary();
+
+        $image = new Image('<html><h1>Test</h1></html>');
+        $image->binary = $binary;
+
+        $this->assertTrue($image->saveAs($outFile));
+        $this->assertFileExists($outFile);
+
+        $this->assertEquals(file_get_contents($outFile), $image->toString());
+        unlink($outFile);
+    }
+
     // Options
     public function testCanOptionsInConstructor()
     {

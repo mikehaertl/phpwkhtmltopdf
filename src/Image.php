@@ -145,6 +145,19 @@ class Image
     }
 
     /**
+     * Get the raw Image contents (triggers Image creation).
+     * @return string|bool The Image content as a string or `false` if the
+     * Image wasn't created successfully.
+     */
+    public function toString()
+    {
+        if (!$this->_isCreated && !$this->createImage()) {
+            return false;
+        }
+        return file_get_contents($this->_tmpImageFile->getFileName());
+    }
+
+    /**
      * Set options
      *
      * @param array $options list of image options to set as name/value pairs
