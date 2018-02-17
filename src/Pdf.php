@@ -263,6 +263,16 @@ class Pdf
     }
 
     /**
+     * Returns an options
+     *
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->_options;
+    }
+
+    /**
      * Run the Command to create the tmp PDF file
      *
      * @return bool whether creation was successful
@@ -313,6 +323,11 @@ class Pdf
      */
     protected function processOptions($options = array())
     {
+        // tmp dir needs to be setup before creating any tmp files
+        if (isset($options['tmpDir'])) {
+            $this->tmpDir = $options['tmpDir'];
+        }
+
         foreach ($options as $key => $val) {
             // Some options expect a URL or a file name, so check if we need a temp file
             if (is_string($val) && preg_match(self::REGEX_OPTS_TMPFILE, $key) ) {
