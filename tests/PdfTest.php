@@ -401,6 +401,19 @@ class PdfTest extends \PHPUnit\Framework\TestCase
         unlink($outFile);
     }
 
+    public function testThatTmpDirIsSetupBeforeCreatingTmpFile()
+    {
+        mkdir($tmpDir = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . uniqid());
+
+        $pdf = new Pdf(array(
+            'tmpDir' => $tmpDir,
+            'header-html' => "<p>I'm a content</p>",
+        ));
+
+        $this->assertInstanceOf('mikehaertl\tmp\File', $pdf->getOptions()['header-html']);
+        $this->assertEquals($tmpDir, dirname($pdf->getOptions()['header-html']));
+    }
+
 
 
     protected function getBinary()
