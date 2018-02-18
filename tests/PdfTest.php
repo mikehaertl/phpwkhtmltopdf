@@ -255,9 +255,13 @@ class PdfTest extends \PHPUnit\Framework\TestCase
         $inFile = $this->getHtmlAsset();
         $outFile = $this->getOutFile();
         $binary = $this->getBinary();
+        $tmpDir = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . uniqid();
+        mkdir($tmpDir);
 
         $pdf = new Pdf(array(
             'binary' => $binary,
+            'tmpDir' => $tmpDir,
+            'header-html' => '<p>header</p>',
             'no-outline',
             'margin-top'    => 0,
             'allow' => array(
@@ -266,11 +270,11 @@ class PdfTest extends \PHPUnit\Framework\TestCase
             ),
         ));
         $this->assertInstanceOf('mikehaertl\wkhtmlto\Pdf', $pdf->addPage($inFile));
+        $this->assertEquals($tmpDir, $pdf->tmpDir);
         $this->assertTrue($pdf->saveAs($outFile));
 
-        $tmpFile = $pdf->getPdfFilename();
         $this->assertFileExists($outFile);
-        $this->assertEquals("$binary --no-outline --margin-top '0' --allow '/tmp' --allow '/test' '$inFile' '$tmpFile'", (string) $pdf->getCommand());
+        $this->assertRegExp("#$binary --header-html '$tmpDir/tmp_wkhtmlto_pdf_[^ ]+\.html' --no-outline --margin-top '0' --allow '/tmp' --allow '/test' '$inFile' '$tmpDir/tmp_wkhtmlto_pdf_[^ ]+\.pdf'#", (string) $pdf->getCommand());
         unlink($outFile);
     }
     public function testCanSetGlobalOptions()
@@ -400,7 +404,6 @@ class PdfTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals("xvfb-run -a --server-args=\"-screen 0, 1024x768x24\" $binary '$inFile' '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
-
 
 
     protected function getBinary()
