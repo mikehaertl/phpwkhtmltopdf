@@ -215,6 +215,11 @@ class Pdf
      */
     public function setOptions($options = array())
     {
+        // #264 tmpDir must be set before calling processOptions
+        if (isset($options['tmpDir'])) {
+            $this->tmpDir = $options['tmpDir'];
+            unset($options['tmpDir']);
+        }
         $options = $this->processOptions($options);
         foreach ($options as $key => $val) {
             if (is_int($key)) {
