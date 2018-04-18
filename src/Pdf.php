@@ -285,6 +285,13 @@ class Pdf
             $command->addArgs($object);
         }
         $command->addArg($fileName, null, true);    // Always escape filename
+		
+		if($command->getReadArgsFromStdin())
+		{
+			$configFilename = $this->getConfigFilename($command->getArgs());
+			$command->setOptions(['configFilename'=>$configFilename]);
+		}
+		
         if (!$command->execute()) {
             $this->_error = $command->getError();
             if (!(file_exists($fileName) && filesize($fileName)!==0 && $this->ignoreWarnings)) {
@@ -329,5 +336,15 @@ class Pdf
             }
         }
         return $options;
+    }
+	
+	/**
+     * @return string the filename of the temporary config file
+     */
+    public function getConfigFilename($args)
+    {
+		$tmpConfigFile = new File(str_replace("\\", "\\\\", $args), '.txt', self::TMP_PREFIX, $this->tmpDir);
+		$this->_tmpFiles[] = $tmpConfigFile;
+		return $tmpConfigFile->getFileName();
     }
 }
