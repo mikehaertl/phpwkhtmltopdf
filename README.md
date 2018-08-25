@@ -34,7 +34,8 @@ $pdf = new Pdf('/path/to/page.html');
 // $pdf->binary = 'C:\...';
 
 if (!$pdf->saveAs('/path/to/page.pdf')) {
-    echo $pdf->getError();
+    $error = $pdf->getError();
+    // ... handle error here
 }
 ```
 
@@ -56,13 +57,22 @@ $pdf->addCover('/path/to/mycover.html');
 $pdf->addToc();
 
 // Save the PDF
-$pdf->saveAs('/path/to/report.pdf');
+if (!$pdf->saveAs('/path/to/report.pdf')) {
+    $error = $pdf->getError();
+    // ... handle error here
+}
 
 // ... or send to client for inline display
-$pdf->send();
+if (!$pdf->send()) {
+    $error = $pdf->getError();
+    // ... handle error here
+}
 
 // ... or send to client as file download
-$pdf->send('report.pdf');
+if (!$pdf->send('report.pdf')) {
+    $error = $pdf->getError();
+    // ... handle error here
+}
 
 // ... or you can get the raw pdf as a string
 $content = $pdf->toString();
@@ -78,10 +88,16 @@ $image = new Image('/path/to/page.html');
 $image->saveAs('/path/to/page.png');
 
 // ... or send to client for inline display
-$image->send();
+if (!$image->send()) {
+    $error = $image->getError();
+    // ... handle error here
+}
 
 // ... or send to client as file download
-$image->send('page.png');
+if (!$image->send('page.png')) {
+    $error = $image->getError();
+    // ... handle error here
+}
 ```
 
 ## Setting options
@@ -312,7 +328,10 @@ $pdf = new Pdf(array(
 // another $options array as second argument.
 $pdf->addPage('/path/to/demo.html');
 
-$pdf->send();
+if (!$pdf->send()) {
+    $error = $pdf->getError();
+    // ... handle error here
+}
 ```
 
 **demo.html**
