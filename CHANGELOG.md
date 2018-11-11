@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2.3.1
+
+ * Fix: Issue #264 Problem with tmpDir passed in constructor
+
+## 2.3.0
+
+ * Issue #258 Add toString() method to Image class
+
+## 2.2.2
+
+ * Also create tmp file for xsl-style-sheet and user-style-sheet if required
+
 ## 2.2.1
 
  * Issue #219: Make `header-html` and `footer-html` also work for Toc and cover page
