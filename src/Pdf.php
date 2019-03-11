@@ -17,6 +17,9 @@ class Pdf
     const TYPE_HTML = 'html';
     const TYPE_XML = 'xml';
 
+    // Regular expression to detect HTML strings
+    const REGEX_HTML = '/<(?:!doctype )?html/i';
+
     // Regular expression to detect XML strings
     const REGEX_XML = '/<\??xml/i';
 
@@ -27,8 +30,11 @@ class Pdf
     // so we need to create a tmp file for the content.
     const REGEX_OPTS_TMPFILE = '/^((header|footer)-html|(xsl|user)-style-sheet)$/i';
 
-    // prefix for tmp files
+    // Prefix for tmp files
     const TMP_PREFIX = 'tmp_wkhtmlto_pdf_';
+
+    // Maximum length of a file path if PHP_MAXPATHLEN is not defined
+    const MAX_PATHLEN = 255;
 
     /**
      * @var string the name of the `wkhtmltopdf` binary. Default is
@@ -139,7 +145,7 @@ class Pdf
      */
     public function addCover($input, $options = array(), $type = null)
     {
-        $options['input'] = ($this->version9 ? '--' : '').'cover';
+        $options['input'] = ($this->version9 ? '--' : '') . 'cover';
         $options['inputArg'] = $this->ensureUrlOrFile($input, $type);
         $this->_objects[] = $this->ensureUrlOrFileOptions($options);
         return $this;
@@ -153,7 +159,7 @@ class Pdf
      */
     public function addToc($options = array())
     {
-        $options['input'] = ($this->version9 ? '--' : '')."toc";
+        $options['input'] = ($this->version9 ? '--' : '') . 'toc';
         $this->_objects[] = $this->ensureUrlOrFileOptions($options);
         return $this;
     }
@@ -224,7 +230,7 @@ class Pdf
         foreach ($options as $key => $val) {
             if (is_int($key)) {
                 $this->_options[] = $val;
-            } elseif ($key[0]!=='_' && property_exists($this, $key)) {
+            } elseif ($key[0] !== '_' && property_exists($this, $key)) {
                 $this->$key = $val;
             } else {
                 $this->_options[$key] = $val;
@@ -287,7 +293,7 @@ class Pdf
         $command->addArg($fileName, null, true);    // Always escape filename
         if (!$command->execute()) {
             $this->_error = $command->getError();
-            if (!(file_exists($fileName) && filesize($fileName)!==0 && $this->ignoreWarnings)) {
+            if (!(file_exists($fileName) && filesize($fileName) !== 0 && $this->ignoreWarnings)) {
                 return false;
             }
         }
@@ -313,10 +319,14 @@ class Pdf
         } elseif ($type === self::TYPE_XML || $type === null && preg_match(self::REGEX_XML, $input)) {
             $ext = '.xml';
         } else {
-            $isHtml = $input !== strip_tags($input);
+            // First check for obvious HTML content to avoid is_file() as much
+            // as possible as it can trigger open_basedir restriction warnings
+            // with long strings.
+            $isHtml = $type === self::TYPE_HTML || preg_match(self::REGEX_HTML, $input);
             if (!$isHtml) {
-                defined('PHP_MAXPATHLEN') || define('PHP_MAXPATHLEN', 255);
-                if ((strlen($input) <= PHP_MAXPATHLEN) && is_file($input)) {
+                $maxPathLen = defined('PHP_MAXPATHLEN') ?
+                    constant('PHP_MAXPATHLEN') : self::MAX_PATHLEN;
+                if (strlen($input) <= $maxPathLen && is_file($input)) {
                     return $input;
                 }
             }
