@@ -17,11 +17,11 @@ class Pdf
     const TYPE_HTML = 'html';
     const TYPE_XML = 'xml';
 
-    // Regular expression to detect HTML strings
-    const REGEX_HTML = '/<(?:!doctype )?html/i';
-
     // Regular expression to detect XML strings
     const REGEX_XML = '/<\??xml/i';
+
+    // Regular expression to detect URL strings
+    const REGEX_URL = '/^(https?:)?\/\//i';
 
     // Regular expression to detect options that expect an URL or a file name,
     // so we need to create a tmp file for the content.
@@ -122,8 +122,8 @@ class Pdf
      */
     public function addPage($input, $options = array(), $type = null)
     {
-        $options['inputArg'] = $this->processInput($input, $type);
-        $this->_objects[] = $this->processOptions($options);
+        $options['inputArg'] = $this->ensureUrlOrFile($input, $type);
+        $this->_objects[] = $this->ensureUrlOrFileOptions($options);
         return $this;
     }
 
@@ -140,8 +140,8 @@ class Pdf
     public function addCover($input, $options = array(), $type = null)
     {
         $options['input'] = ($this->version9 ? '--' : '').'cover';
-        $options['inputArg'] = $this->processInput($input, $type);
-        $this->_objects[] = $this->processOptions($options);
+        $options['inputArg'] = $this->ensureUrlOrFile($input, $type);
+        $this->_objects[] = $this->ensureUrlOrFileOptions($options);
         return $this;
     }
 
@@ -154,7 +154,7 @@ class Pdf
     public function addToc($options = array())
     {
         $options['input'] = ($this->version9 ? '--' : '')."toc";
-        $this->_objects[] = $this->processOptions($options);
+        $this->_objects[] = $this->ensureUrlOrFileOptions($options);
         return $this;
     }
 
@@ -215,12 +215,12 @@ class Pdf
      */
     public function setOptions($options = array())
     {
-        // #264 tmpDir must be set before calling processOptions
+        // #264 tmpDir must be set before calling ensureUrlOrFileOptions
         if (isset($options['tmpDir'])) {
             $this->tmpDir = $options['tmpDir'];
             unset($options['tmpDir']);
         }
-        $options = $this->processOptions($options);
+        $options = $this->ensureUrlOrFileOptions($options);
         foreach ($options as $key => $val) {
             if (is_int($key)) {
                 $this->_options[] = $val;
@@ -296,35 +296,50 @@ class Pdf
     }
 
     /**
-     * @param string $input
-     * @param string|null $type a type hint if the input is a string of known type. This can either be
-     * `TYPE_HTML` or `TYPE_XML`. If `null` (default) the type is auto detected from the string content.
-     * @return \mikehaertl\tmp\File|string a File object if the input is a HTML or XML string. The unchanged input otherwhise.
+     * This method creates a temporary file if the string is neither a URL nor
+     * contains XML or HTML and is also not a valid file name.
+     *
+     * @param string $input the string to check
+     * @param string|null $type a type hint if the input is a string of known
+     * type. This can either be `TYPE_HTML` or `TYPE_XML`. If `null` (default)
+     * the type is auto detected from the string content.
+     * @return \mikehaertl\tmp\File|string a File object if the input is a HTML
+     * or XML string. The unchanged input otherwhise.
      */
-    protected function processInput($input, $type = null)
+    protected function ensureUrlOrFile($input, $type = null)
     {
-        if ($type === self::TYPE_HTML || $type === null && preg_match(self::REGEX_HTML, $input)) {
-            return $this->_tmpFiles[] = new File($input, '.html', self::TMP_PREFIX, $this->tmpDir);
-        } elseif ($type === self::TYPE_XML || preg_match(self::REGEX_XML, $input)) {
-            return $this->_tmpFiles[] = new File($input, '.xml', self::TMP_PREFIX, $this->tmpDir);
-        } else {
+        if (preg_match(self::REGEX_URL, $input)) {
             return $input;
+        } elseif ($type === self::TYPE_XML || $type === null && preg_match(self::REGEX_XML, $input)) {
+            $ext = '.xml';
+        } else {
+            $isHtml = $input !== strip_tags($input);
+            if (!$isHtml) {
+                defined('PHP_MAXPATHLEN') || define('PHP_MAXPATHLEN', 255);
+                if ((strlen($input) <= PHP_MAXPATHLEN) && is_file($input)) {
+                    return $input;
+                }
+            }
+            $ext = '.html';
         }
+        $file = new File($input, $ext, self::TMP_PREFIX, $this->tmpDir);
+        $this->_tmpFiles[] = $file;
+        return $file;
     }
 
     /**
      * @param array $options list of options as name/value pairs
-     * @return array options with raw content converted to tmp files where neccessary
+     * @return array options with raw HTML/XML/String content converted to tmp
+     * files where neccessary
      */
-    protected function processOptions($options = array())
+    protected function ensureUrlOrFileOptions($options = array())
     {
         foreach ($options as $key => $val) {
             // Some options expect a URL or a file name, so check if we need a temp file
             if (is_string($val) && preg_match(self::REGEX_OPTS_TMPFILE, $key) ) {
-                defined('PHP_MAXPATHLEN') || define('PHP_MAXPATHLEN', 255);
-                $isFile = (strlen($val) <= PHP_MAXPATHLEN) ? is_file($val) : false;
-                if (!($isFile || preg_match('/^(https?:)?\/\//i',$val) || $val === strip_tags($val))) {
-                    $options[$key] = new File($val, '.html', self::TMP_PREFIX, $this->tmpDir);
+                $file = $this->ensureUrlOrFile($val);
+                if ($file instanceof File) {
+                    $options[$key] = $file;
                 }
             }
         }
