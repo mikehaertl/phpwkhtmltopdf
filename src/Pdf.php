@@ -315,7 +315,10 @@ class Pdf
      */
     protected function ensureUrlOrFile($input, $type = null)
     {
-        if ($input instanceof File || preg_match(self::REGEX_URL, $input)) {
+        if ($input instanceof File) {
+            $this->_tmpFiles[] = $input;
+            return $input;
+        } elseif (preg_match(self::REGEX_URL, $input)) {
             return $input;
         } elseif ($type === self::TYPE_XML || $type === null && preg_match(self::REGEX_XML, $input)) {
             $ext = '.xml';
