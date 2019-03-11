@@ -1,5 +1,6 @@
 <?php
 use mikehaertl\wkhtmlto\Pdf;
+use mikehaertl\tmp\File;
 
 class PdfTest extends \PHPUnit\Framework\TestCase
 {
@@ -127,6 +128,18 @@ class PdfTest extends \PHPUnit\Framework\TestCase
         $pdf->addPage('<html><h1>test</h1></html>');
         $pdf->saveAs($outFile);
         $this->assertRegexp('/tmp_wkhtmlto_pdf_.*?\.html/', $pdf->getCommand()->getExecCommand());
+        unlink($outFile);
+    }
+    public function testCanAddPageFromFileInstance()
+    {
+        $outFile = $this->getOutFile();
+        $binary = $this->getBinary();
+
+        $pdf = new Pdf;
+        $pdf->binary = $binary;
+        $pdf->addPage(new File('Some content', '.html'));
+        $pdf->saveAs($outFile);
+        $this->assertRegexp('/php_tmpfile_.*?\.html/', $pdf->getCommand()->getExecCommand());
         unlink($outFile);
     }
     public function testCanAddPageFromXmlString()
@@ -344,6 +357,25 @@ class PdfTest extends \PHPUnit\Framework\TestCase
             'binary' => $binary,
             'header-html' => '<h1>Header</h1>',
             'footer-html' => '<h1>Footer</h1>',
+        ));
+        $this->assertInstanceOf('mikehaertl\wkhtmlto\Pdf', $pdf->addPage($inFile));
+        $this->assertTrue($pdf->saveAs($outFile));
+        $this->assertFileExists($outFile);
+
+        $tmpFile = $pdf->getPdfFilename();
+        $this->assertRegExp("#$binary --header-html '/tmp/[^ ]+' --footer-html '/tmp/[^ ]+' '$inFile' '$tmpFile'#", (string) $pdf->getCommand());
+        unlink($outFile);
+    }
+    public function testCanAddHeaderAndFooterAsFile()
+    {
+        $inFile = $this->getHtmlAsset();
+        $outFile = $this->getOutFile();
+        $binary = $this->getBinary();
+
+        $pdf = new Pdf(array(
+            'binary' => $binary,
+            'header-html' => new File('Some header content', '.html'),
+            'footer-html' => new File('Some footer content', '.html'),
         ));
         $this->assertInstanceOf('mikehaertl\wkhtmlto\Pdf', $pdf->addPage($inFile));
         $this->assertTrue($pdf->saveAs($outFile));

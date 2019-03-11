@@ -302,10 +302,11 @@ class Pdf
     }
 
     /**
-     * This method creates a temporary file if the string is neither a URL nor
-     * contains XML or HTML and is also not a valid file name.
+     * This method creates a temporary file if the passed argument is neither a
+     * File instance or URL nor contains XML or HTML and is also not a valid
+     * file name.
      *
-     * @param string $input the string to check
+     * @param string|File $input the input argument File to check
      * @param string|null $type a type hint if the input is a string of known
      * type. This can either be `TYPE_HTML` or `TYPE_XML`. If `null` (default)
      * the type is auto detected from the string content.
@@ -314,7 +315,7 @@ class Pdf
      */
     protected function ensureUrlOrFile($input, $type = null)
     {
-        if (preg_match(self::REGEX_URL, $input)) {
+        if ($input instanceof File || preg_match(self::REGEX_URL, $input)) {
             return $input;
         } elseif ($type === self::TYPE_XML || $type === null && preg_match(self::REGEX_XML, $input)) {
             $ext = '.xml';

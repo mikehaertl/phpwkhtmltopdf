@@ -22,6 +22,8 @@ composer require mikehaertl/phpwkhtmltopdf
 Make sure, that you include the composer [autoloader](https://getcomposer.org/doc/01-basic-usage.md#autoloading)
 somewhere in your codebase.
 
+## Examples
+
 ### Single page PDF
 
 ```php
