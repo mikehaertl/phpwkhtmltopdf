@@ -22,6 +22,8 @@ composer require mikehaertl/phpwkhtmltopdf
 Make sure, that you include the composer [autoloader](https://getcomposer.org/doc/01-basic-usage.md#autoloading)
 somewhere in your codebase.
 
+## Examples
+
 ### Single page PDF
 
 ```php
@@ -184,6 +186,23 @@ $pdf = new Pdf(array(
         ),
     ),
 ));
+```
+
+### Passing strings
+
+Some options like `header-html` usually expect a URL or a filename. With our
+library you can also pass a string. The class will try to detect if the
+argument is a URL, a filename or some HTML or XML content.  To make detection
+easier you can surround your content in `<html>` tag.
+
+If this doesn't work correctly you can also pass an instance of our `File`
+helper as a last resort:
+
+```php
+use mikehaertl\tmp\File;
+$options = [
+    'header-html' => new File('Complex content', '.html'),
+];
 ```
 
 ## Error handling
