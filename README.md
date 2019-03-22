@@ -11,8 +11,6 @@ PHP WkHtmlToPdf provides a simple and clean interface to ease PDF and image crea
 [wkhtmltopdf](http://wkhtmltopdf.org). **The `wkhtmltopdf` and - optionally - `wkhtmltoimage`
 command must be installed and working on your system.** See the section below for details.
 
-For Windows usage make sure to add the path to wkhtmltopdf "bin" folder in the system variables PATH
-
 For Windows systems make sure to set the path to wkhtmltopdf.exe in the binary option. Alternatively you can add the wkhtmltopdf "bin" directory to the system PATH variable to allow wkhtmltopdf command available to Windows CMD and not needing to change the code when moving your app to a different system.
 
 ## Installation
