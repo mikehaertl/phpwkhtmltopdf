@@ -43,6 +43,15 @@ class Pdf
     public $binary = 'wkhtmltopdf';
 
     /**
+     * @var boolean the value of var $enableXvfb in the Command() class instance:
+     * ----- public function getCommand(){ ... } -----
+     * attributing TRUE value to this var, solve @error "QXcbConnection: Could not connect to display"
+     * in Debian systems like explained in the folowing "Question URL":
+     * https://unix.stackexchange.com/questions/192642/wkhtmltopdf-qxcbconnection-could-not-connect-to-display
+     */
+    public $enableXvfb = false;
+
+    /**
      * @var array options to pass to the Command constructor. Default is none.
      */
     public $commandOptions = array();
@@ -250,6 +259,7 @@ class Pdf
                 $options['command'] = $this->binary;
             }
             $this->_command = new Command($options);
+            $this->_command->enableXvfb = $this->enableXvfb;
         }
         return $this->_command;
     }
