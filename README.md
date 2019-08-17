@@ -4,7 +4,6 @@ PHP WkHtmlToPdf
 [![Build Status](https://secure.travis-ci.org/mikehaertl/phpwkhtmltopdf.png)](http://travis-ci.org/mikehaertl/phpwkhtmltopdf)
 [![Latest Stable Version](https://poser.pugx.org/mikehaertl/phpwkhtmltopdf/v/stable.svg)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
 [![Total Downloads](https://poser.pugx.org/mikehaertl/phpwkhtmltopdf/downloads)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
-[![Latest Unstable Version](https://poser.pugx.org/mikehaertl/phpwkhtmltopdf/v/unstable.svg)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
 [![License](https://poser.pugx.org/mikehaertl/phpwkhtmltopdf/license.svg)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
 
 PHP WkHtmlToPdf provides a simple and clean interface to ease PDF and image creation with
