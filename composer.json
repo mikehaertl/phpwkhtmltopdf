@@ -20,10 +20,5 @@
         "psr-4": {
             "mikehaertl\\wkhtmlto\\": "src/"
         }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.0.x-dev"
-        }
     }
 }
