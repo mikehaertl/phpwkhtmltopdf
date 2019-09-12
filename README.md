@@ -182,7 +182,7 @@ $pdf = new Pdf(array(
     'commandOptions' => array(
         'useExec' => true,      // Can help if generation fails without a useful error message
         'procEnv' => array(
-            // Check the output of 'locale' on your system to find supported languages
+            // Check the output of 'locale -a' on your system to find supported languages
             'LANG' => 'en_US.utf-8',
         ),
     ),
