@@ -180,7 +180,7 @@ $pdf = new Pdf(array(
     'binary' => '/obscure/path/to/wkhtmltopdf',
     'ignoreWarnings' => true,
     'commandOptions' => array(
-        'useExec' => true,      // Can help if generation fails without a useful error message
+        'useExec' => true,      // Can help on Windows systems
         'procEnv' => array(
             // Check the output of 'locale -a' on your system to find supported languages
             'LANG' => 'en_US.utf-8',
