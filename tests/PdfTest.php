@@ -327,14 +327,14 @@ class PdfTest extends \PHPUnit\Framework\TestCase
             'zoom' => 1.5,
             'cookie' => array('name'=>'value'),
             'replace' => array(
-                '{x}' => 'x',
-                '{y}' => '',
+                'x' => 'v',
+                'y' => '',
             ),
         )));
         $this->assertInstanceOf('mikehaertl\wkhtmlto\Pdf', $pdf->addCover($inFile, array(
             'replace' => array(
-                '{x}' => 'a',
-                '{y}' => 'b',
+                'x' => 'a',
+                'y' => 'b',
             ),
         )));
         $this->assertInstanceOf('mikehaertl\wkhtmlto\Pdf', $pdf->addToc(array(
@@ -344,7 +344,7 @@ class PdfTest extends \PHPUnit\Framework\TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertEquals("$binary --no-outline --margin-top '0' --header-center 'test {x} {y}' '$inFile' --no-background --zoom '1.5' --cookie 'name' 'value' --replace '{x}' 'x' --replace '{y}' '' cover '$inFile' --replace '{x}' 'a' --replace '{y}' 'b' toc --disable-dotted-lines '$tmpFile'", (string) $pdf->getCommand());
+        $this->assertEquals("$binary --no-outline --margin-top '0' --header-center 'test {x} {y}' '$inFile' --no-background --zoom '1.5' --cookie 'name' 'value' --replace 'x' 'v' --replace 'y' '' cover '$inFile' --replace 'x' 'a' --replace 'y' 'b' toc --disable-dotted-lines '$tmpFile'", (string) $pdf->getCommand());
         unlink($outFile);
     }
     public function testCanAddHeaderAndFooterAsHtml()

@@ -129,8 +129,8 @@ $options = array(
 
     // Repeatable options with 2 arguments
     'replace' => array(
-        '{page}' => $page++,
-        '{title}' => $pageTitle,
+        'number' => $page++,      // Replace '[number]'
+        'title' => $pageTitle,    // Replace '[title]'
     ),
 );
 ```
