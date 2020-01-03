@@ -139,7 +139,7 @@ class ImageTest extends \PHPUnit\Framework\TestCase
 
         $tmpFile = $image->getimageFilename();
         $this->assertFileExists($outFile);
-        $this->assertEquals("$binary --transparent --width '800' --allow '/tmp' --allow '/test' '$inFile' '$tmpFile'", (string) $image->getCommand());
+        $this->assertEquals("$binary '--transparent' '--width' '800' '--allow' '/tmp' '--allow' '/test' '$inFile' '$tmpFile'", (string) $image->getCommand());
         unlink($outFile);
     }
     public function testCanSetOptions()
@@ -164,7 +164,7 @@ class ImageTest extends \PHPUnit\Framework\TestCase
 
         $tmpFile = $image->getimageFilename();
         $this->assertFileExists($outFile);
-        $this->assertEquals("$binary --transparent --width '800' --allow '/tmp' --allow '/test' '$inFile' '$tmpFile'", (string) $image->getCommand());
+        $this->assertEquals("$binary '--transparent' '--width' '800' '--allow' '/tmp' '--allow' '/test' '$inFile' '$tmpFile'", (string) $image->getCommand());
         unlink($outFile);
     }
 
