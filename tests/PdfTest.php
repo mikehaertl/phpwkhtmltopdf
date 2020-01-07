@@ -1,8 +1,11 @@
 <?php
+namespace mikehaertl\wkhtmlto\tests;
+
+use PHPUnit\Framework\TestCase;
 use mikehaertl\wkhtmlto\Pdf;
 use mikehaertl\tmp\File;
 
-class PdfTest extends \PHPUnit\Framework\TestCase
+class PdfTest extends TestCase
 {
     CONST URL = 'http://www.google.com/robots.txt';
 
