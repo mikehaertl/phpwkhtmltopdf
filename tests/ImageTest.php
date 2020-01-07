@@ -1,7 +1,10 @@
 <?php
+namespace mikehaertl\wkhtmlto\tests;
+
+use PHPUnit\Framework\TestCase;
 use mikehaertl\wkhtmlto\Image;
 
-class ImageTest extends \PHPUnit\Framework\TestCase
+class ImageTest extends TestCase
 {
     CONST URL = 'http://www.google.com/robots.txt';
 
