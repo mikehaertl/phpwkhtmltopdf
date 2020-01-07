@@ -18,12 +18,12 @@
     },
     "autoload": {
         "psr-4": {
-            "mikehaertl\\wkhtmlto\\": "src/"
+            "mikehaertl\\wkhtmlto\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "mikehaertl\\wkhtmlto\\tests\\": "tests/"
+            "tests\\": "tests"
         }
     },
     "require-dev": {

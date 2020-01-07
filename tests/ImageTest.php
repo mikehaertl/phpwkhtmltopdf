@@ -1,5 +1,5 @@
 <?php
-namespace mikehaertl\wkhtmlto\tests;
+namespace tests;
 
 use PHPUnit\Framework\TestCase;
 use mikehaertl\wkhtmlto\Image;
