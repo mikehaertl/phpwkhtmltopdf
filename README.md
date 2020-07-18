@@ -12,6 +12,8 @@ command must be installed and working on your system.** See the section below fo
 
 For Windows systems make sure to set the path to wkhtmltopdf.exe in the binary option. Alternatively you can add the wkhtmltopdf "bin" directory to the system PATH variable to allow wkhtmltopdf command available to Windows CMD.
 
+Integrate with Laravel: [How to Generate PDF with Graph in Laravel?](https://www.itsolutionstuff.com/post/how-to-generate-pdf-with-graph-in-laravelexample.html)
+
 ## Installation
 
 Install the package through [composer](http://getcomposer.org):
