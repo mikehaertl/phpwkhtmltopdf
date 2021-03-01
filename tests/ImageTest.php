@@ -35,7 +35,13 @@ class ImageTest extends TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $image->getImageFilename();
-        $this->assertRegExp("#$binary '[^ ]+' '$tmpFile'#", (string) $image->getCommand());
+        $regex = "#$binary '[^ ]+' '$tmpFile'#";
+        $command = (string) $image->getCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanCreateImageFromUrl()
@@ -84,7 +90,13 @@ class ImageTest extends TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $image->getImageFilename();
-        $this->assertRegExp("#$binary '[^ ]+' '$tmpFile'#", (string) $image->getCommand());
+        $regex = "#$binary '[^ ]+' '$tmpFile'#";
+        $command = (string) $image->getCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanSetPageFromUrl()
