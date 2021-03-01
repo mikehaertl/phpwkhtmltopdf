@@ -133,14 +133,21 @@ class Image
      * configured as $type (png, jpg, ...).
      * @param bool $inline whether to force inline display of the image, even
      * if filename is present.
+     * @param array $headers a list of additional HTTP headers to send in the
+     * response as an array. The array keys are the header names like
+     * 'Cache-Control' and the array values the header value strings to send.
+     * Each array value can also be another array of strings if the same header
+     * should be sent multiple times. This can also be used to override
+     * automatically created headers like 'Expires' or 'Content-Length'. To suppress
+     * automatically created headers, `false` can also be used as header value.
      * @return bool whether image was created successfully
      */
-    public function send($filename = null,$inline = false)
+    public function send($filename = null, $inline = false, $headers = array())
     {
         if (!$this->_isCreated && !$this->createImage()) {
             return false;
         }
-        $this->_tmpImageFile->send($filename, $this->getMimeType(), $inline);
+        $this->_tmpImageFile->send($filename, $this->getMimeType(), $inline, $headers);
         return true;
     }
 
