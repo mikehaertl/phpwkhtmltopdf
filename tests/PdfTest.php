@@ -36,7 +36,13 @@ class PdfTest extends TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary '[^ ]+' '$tmpFile'#", (string) $pdf->getCommand());
+        $regex = "#$binary '[^ ]+' '$tmpFile'#";
+        $command = (string) $pdf->getCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanCreatePdfFromXmlString()
@@ -50,7 +56,13 @@ class PdfTest extends TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary '[^ ]+' '$tmpFile'#", (string) $pdf->getCommand());
+        $regex = "#$binary '[^ ]+' '$tmpFile'#";
+        $command = (string) $pdf->getCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanCreatePdfFromUrl()
@@ -101,7 +113,13 @@ class PdfTest extends TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary '[^ ]+' '[^ ]+' '$tmpFile'#", (string) $pdf->getCommand());
+        $regex = "#$binary '[^ ]+' '[^ ]+' '$tmpFile'#";
+        $command = (string) $pdf->getCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanAddPagesFromUrl()
@@ -130,7 +148,13 @@ class PdfTest extends TestCase
         $pdf->binary = $binary;
         $pdf->addPage('<html><h1>test</h1></html>');
         $pdf->saveAs($outFile);
-        $this->assertRegexp('/tmp_wkhtmlto_pdf_.*?\.html/', $pdf->getCommand()->getExecCommand());
+        $regex = "/tmp_wkhtmlto_pdf_.*?\.html/";
+        $command = (string) $pdf->getCommand()->getExecCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanAddPageFromFileInstance()
@@ -142,7 +166,13 @@ class PdfTest extends TestCase
         $pdf->binary = $binary;
         $pdf->addPage(new File('Some content', '.html'));
         $pdf->saveAs($outFile);
-        $this->assertRegexp('/php_tmpfile_.*?\.html/', $pdf->getCommand()->getExecCommand());
+        $regex = "/php_tmpfile_.*?\.html/";
+        $command = (string) $pdf->getCommand()->getExecCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanAddPageFromXmlString()
@@ -154,7 +184,13 @@ class PdfTest extends TestCase
         $pdf->binary = $binary;
         $pdf->addPage('<xml>test</xml>');
         $pdf->saveAs($outFile);
-        $this->assertRegexp('/tmp_wkhtmlto_pdf_.*?\.xml/', $pdf->getCommand()->getExecCommand());
+        $regex = "/tmp_wkhtmlto_pdf_.*?\.xml/";
+        $command = (string) $pdf->getCommand()->getExecCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanAddHtmlPageFromStringByType()
@@ -166,7 +202,13 @@ class PdfTest extends TestCase
         $pdf->binary = $binary;
         $pdf->addPage('Test', array(), Pdf::TYPE_HTML);
         $pdf->saveAs($outFile);
-        $this->assertRegexp('/tmp_wkhtmlto_pdf_.*?\.html/', $pdf->getCommand()->getExecCommand());
+        $regex = "/tmp_wkhtmlto_pdf_.*?\.html/";
+        $command = (string) $pdf->getCommand()->getExecCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanAddXmlPageFromStringByType()
@@ -178,7 +220,13 @@ class PdfTest extends TestCase
         $pdf->binary = $binary;
         $pdf->addPage('Test', array(), Pdf::TYPE_XML);
         $pdf->saveAs($outFile);
-        $this->assertRegexp('/tmp_wkhtmlto_pdf_.*?\.xml/', $pdf->getCommand()->getExecCommand());
+        $regex = "/tmp_wkhtmlto_pdf_.*?\.xml/";
+        $command = (string) $pdf->getCommand()->getExecCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
 
@@ -213,7 +261,13 @@ class PdfTest extends TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary 'cover' '[^ ]+' '$tmpFile'#", (string) $pdf->getCommand());
+        $regex = "#$binary 'cover' '[^ ]+' '$tmpFile'#";
+        $command = (string) $pdf->getCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanAddCoverFromUrl()
@@ -246,7 +300,13 @@ class PdfTest extends TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary '[^ ]+' 'toc' '$tmpFile'#", (string) $pdf->getCommand());
+        $regex = "#$binary '[^ ]+' 'toc' '$tmpFile'#";
+        $command = (string) $pdf->getCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
 
@@ -290,7 +350,13 @@ class PdfTest extends TestCase
         $this->assertTrue($pdf->saveAs($outFile));
 
         $this->assertFileExists($outFile);
-        $this->assertRegExp("#$binary '--header-html' '$tmpDir/tmp_wkhtmlto_pdf_[^ ]+\.html' '--no-outline' '--margin-top' '0' '--allow' '/tmp' '--allow' '/test' '$inFile' '$tmpDir/tmp_wkhtmlto_pdf_[^ ]+\.pdf'#", (string) $pdf->getCommand());
+        $regex = "#$binary '--header-html' '$tmpDir/tmp_wkhtmlto_pdf_[^ ]+\.html' '--no-outline' '--margin-top' '0' '--allow' '/tmp' '--allow' '/test' '$inFile' '$tmpDir/tmp_wkhtmlto_pdf_[^ ]+\.pdf'#";
+        $command = (string) $pdf->getCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanSetGlobalOptions()
@@ -366,7 +432,13 @@ class PdfTest extends TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary '--header-html' '/tmp/[^ ]+' '--footer-html' '/tmp/[^ ]+' '$inFile' '$tmpFile'#", (string) $pdf->getCommand());
+        $regex = "#$binary '--header-html' '/tmp/[^ ]+' '--footer-html' '/tmp/[^ ]+' '$inFile' '$tmpFile'#";
+        $command = (string) $pdf->getCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanAddHeaderAndFooterAsFile()
@@ -385,7 +457,13 @@ class PdfTest extends TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary '--header-html' '/tmp/[^ ]+' '--footer-html' '/tmp/[^ ]+' '$inFile' '$tmpFile'#", (string) $pdf->getCommand());
+        $regex = "#$binary '--header-html' '/tmp/[^ ]+' '--footer-html' '/tmp/[^ ]+' '$inFile' '$tmpFile'#";
+        $command = (string) $pdf->getCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
     public function testCanAddHeaderAndFooterAsHtmlToPagesAndCoverAndToc()
@@ -413,7 +491,13 @@ class PdfTest extends TestCase
         $this->assertFileExists($outFile);
 
         $tmpFile = $pdf->getPdfFilename();
-        $this->assertRegExp("#$binary '/tmp/[^ ]+\.html' '--header-html' '/tmp/[^ ]+\.html' '--footer-html' '/tmp/[^ ]+\.html' 'cover' '$inFile' '--header-html' '/tmp/[^ ]+\.html' '--footer-html' '/tmp/[^ ]+\.html' 'toc' '--header-html' '/tmp/[^ ]+\.html' '--footer-html' '/tmp/[^ ]+\.html' '$tmpFile'#", (string) $pdf->getCommand());
+        $regex = "#$binary '/tmp/[^ ]+\.html' '--header-html' '/tmp/[^ ]+\.html' '--footer-html' '/tmp/[^ ]+\.html' 'cover' '$inFile' '--header-html' '/tmp/[^ ]+\.html' '--footer-html' '/tmp/[^ ]+\.html' 'toc' '--header-html' '/tmp/[^ ]+\.html' '--footer-html' '/tmp/[^ ]+\.html' '$tmpFile'#";
+        $command = (string) $pdf->getCommand();
+        if (phpUnitVersion('<', 9)) {
+            $this->assertRegExp($regex, $command);
+        } else {
+            $this->assertMatchesRegularExpression($regex, $command);
+        }
         unlink($outFile);
     }
 

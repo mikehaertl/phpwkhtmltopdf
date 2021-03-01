@@ -1,10 +1,11 @@
 PHP WkHtmlToPdf
 ===============
 
-[![Build Status](https://secure.travis-ci.org/mikehaertl/phpwkhtmltopdf.png)](http://travis-ci.org/mikehaertl/phpwkhtmltopdf)
-[![Latest Stable Version](https://poser.pugx.org/mikehaertl/phpwkhtmltopdf/v/stable.svg)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
-[![Total Downloads](https://poser.pugx.org/mikehaertl/phpwkhtmltopdf/downloads)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
-[![License](https://poser.pugx.org/mikehaertl/phpwkhtmltopdf/license.svg)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
+[![GitHub Tests](https://github.com/mikehaertl/phpwkhtmltopdf/workflows/Tests/badge.svg)](https://github.com/mikehaertl/phpwkhtmltopdf/actions)
+[![Packagist Version](https://img.shields.io/packagist/v/mikehaertl/phpwkhtmltopdf?label=version)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/mikehaertl/phpwkhtmltopdf)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
+[![GitHub license](https://img.shields.io/github/license/mikehaertl/phpwkhtmltopdf)](https://github.com/mikehaertl/phpwkhtmltopdf/blob/master/LICENSE)
+[![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/mikehaertl/phpwkhtmltopdf)](https://packagist.org/packages/mikehaertl/phpwkhtmltopdf)
 
 PHP WkHtmlToPdf provides a simple and clean interface to ease PDF and image creation with
 [wkhtmltopdf](http://wkhtmltopdf.org). **The `wkhtmltopdf` and - optionally - `wkhtmltoimage`
