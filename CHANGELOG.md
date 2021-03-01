@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 2.5.0
+
+ * Enhancement: Issue #366 Allow to pass additional HTTP headers to the `send()` method
+
+## 2.4.2
+
+ * This release only contains fixes for the test setup.
+
+## 2.4.1
+
+ * Fix: Pushed version constraints for php-shellcommand and php-tmpfile which should fix hanging issues.
+
+## 2.4.0
+
+ * Enhancement: Issue #307 Improved and unified detection of URL, File, HTML and XML content
+
 ## 2.3.1
 
  * Fix: Issue #264 Problem with tmpDir passed in constructor
