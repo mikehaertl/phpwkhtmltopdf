@@ -29,6 +29,7 @@ somewhere in your codebase.
 ### Single page PDF
 
 ```php
+<?php
 use mikehaertl\wkhtmlto\Pdf;
 
 // You can pass a filename, a HTML string, an URL or an options array to the constructor
@@ -47,6 +48,7 @@ if (!$pdf->saveAs('/path/to/page.pdf')) {
 
 
 ```php
+<?php
 use mikehaertl\wkhtmlto\Pdf;
 
 $pdf = new Pdf;
@@ -85,6 +87,7 @@ $content = $pdf->toString();
 ### Creating an image
 
 ```php
+<?php
 use mikehaertl\wkhtmlto\Image;
 
 // You can pass a filename, a HTML string, an URL or an options array to the constructor
@@ -115,6 +118,7 @@ The `wkhtmltopdf` shell command accepts different types of options:
 Please see `wkhtmltopdf -H` for a full explanation. All options are passed as array, for example:
 
 ```php
+<?php
 $options = array(
     'no-outline',           // option without argument
     'encoding' => 'UTF-8',  // option with argument
@@ -139,6 +143,7 @@ $options = array(
 Options can be passed to several methods for PDFs:
 
 ```php
+<?php
 $pdf = new Pdf($globalOptions);         // Set global PDF options
 $pdf->setOptions($globalOptions);       // Set global PDF options (alternative)
 $pdf->addPage($page, $pageOptions);     // Add page with options
@@ -152,6 +157,7 @@ $pdf->addToc($tocOptions);              // Add TOC with options
 For `wkhtmltoimage` there's only one set of options:
 
 ```php
+<?php
 $image = new Image($options);   // Set image options
 $image->setOptions($options);   // Set image options (alternative)
 ```
@@ -177,6 +183,7 @@ the `Image` class also has a `type` option:
 want to pass UTF-8 encoded arguments, you may have to set the `LANG` environment variable.
 
 ```php
+<?php
 $pdf = new Pdf(array(
     'binary' => '/obscure/path/to/wkhtmltopdf',
     'ignoreWarnings' => true,
@@ -201,6 +208,7 @@ If this doesn't work correctly you can also pass an instance of our `File`
 helper as a last resort:
 
 ```php
+<?php
 use mikehaertl\tmp\File;
 $options = [
     'header-html' => new File('Complex content', '.html'),
@@ -213,6 +221,7 @@ $options = [
 available from `getError()`:
 
 ```php
+<?php
 if (!$pdf->send()) {
     throw new Exception('Could not create PDF: '.$pdf->getError());
 }
@@ -223,13 +232,16 @@ if ($content === false) {
 }
 ```
 
-## Note for Windows users
+## Known Issues
+
+### Use under Windows
 
 If you use double quotes (`"`) or percent signs (`%`) as option values, they may get converted to spaces.
 In this case you can disable argument escaping in the [command](https://github.com/mikehaertl/php-shellcommand).
-There are also two interesting options to `proc_open()` that you may want to use:
+There are also two interesting options to `proc_open()` that you may want to use on Windows:
 
 ```php
+<?php
 $pdf = new Pdf(array(
     'commandOptions' => array(
         'escapeArgs' => false,
@@ -249,6 +261,37 @@ surround your argument values with extra double quotes.
 
 I also found that some options don't work on Windows (tested with wkhtmltopdf 0.11 rc2), like the
 `user-style-sheet` option used in the example below.
+
+### Download Problems
+
+There have been many reports about corrupted PDFs or images when using `send()`.
+They are often caused by the webserver (Apache, Nginx, ...) performing additional
+compression. This will mess up the `Content-Length` header which is added by this
+library. It's useful to let the browser show a progress bar.
+
+To fix this there are two options:
+
+ 1. Exclude the download URL from compression in your Webserver. For example if your
+    script is called `pdf.php` then for [mod_deflate](https://httpd.apache.org/docs/2.4/mod/mod_deflate.html) in Apache
+    you could try to add this to your configuration:
+    ```
+    SetEnvIfNoCase REQUEST_URI ^/pdf.php$ no-gzip dont-vary
+    ```
+
+    For Nginx there are [similar solutions](https://serverfault.com/questions/438237/turn-off-gzip-for-a-location-in-nginx)
+    to disable `gzip` for a specific location.
+
+ 2. Suppress the `Content-Length` header when you send a file (available since 2.5.0):
+
+    ```php
+    <?php
+    $pdf->send('name.pdf', false, array(
+        'Content-Length' => false,
+    ));
+    $image->send('name.png', false, array(
+        'Content-Length' => false,
+    ));
+    ```
 
 
 ## Installation of wkhtmltopdf
@@ -281,6 +324,7 @@ which will create quite some extra load on your CPU. So this setup is only recom
 To use the built in support you have to set `enableXvfb` in the `commandOptions`. There are also some options you can set.
 
 ```php
+<?php
 $pdf = new Pdf(array(
     // Explicitly tell wkhtmltopdf that we're using an X environment
     'use-xserver',
@@ -314,6 +358,7 @@ If your `Xvfb` process is running, you just have to tell the class to use this X
 rendering. This is done via an environment variable.
 
 ```php
+<?php
 $pdf = new Pdf(array(
     'use-xserver',
     'commandOptions' => array(
@@ -330,6 +375,7 @@ But then I had scaling issues which went away after I set all margins to zero an
 added the margins through CSS. You can also use `cm` or `in` in CSS as this is more apropriate for print styles.
 
 ```php
+<?php
 use mikehaertl\wkhtmlto\Pdf;
 
 // Create a new Pdf object with some global PDF options
