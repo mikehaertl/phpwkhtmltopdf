@@ -287,6 +287,7 @@ class Pdf
     {
         if ($this->_tmpPdfFile === null) {
             $this->_tmpPdfFile = new File('', '.pdf', self::TMP_PREFIX, $this->tmpDir);
+            $this->_tmpPdfFile->delete = $this->tmpDelete;
         }
         return $this->_tmpPdfFile->getFileName();
     }
