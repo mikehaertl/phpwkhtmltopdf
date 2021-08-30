@@ -240,7 +240,7 @@ class Pdf
         }
 
         if (isset($options['tmpDelete'])) {
-            $this->tmpDelete = $options['tmpDelete'];
+            $this->tmpDelete = (bool)$options['tmpDelete'];
             unset($options['tmpDelete']);
         }
 
