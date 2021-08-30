@@ -54,6 +54,11 @@ class Pdf
     public $tmpDir;
 
     /**
+     * @var bool delete the temporary files after command finish
+     */
+    public $tmpDelete = true;
+
+    /**
      * @var bool whether to ignore any errors if some PDF file was still
      * created. Default is false.
      */
@@ -233,6 +238,12 @@ class Pdf
             $this->tmpDir = $options['tmpDir'];
             unset($options['tmpDir']);
         }
+
+        if (isset($options['tmpDelete'])) {
+            $this->tmpDelete = $options['tmpDelete'];
+            unset($options['tmpDelete']);
+        }
+
         $options = $this->ensureUrlOrFileOptions($options);
         foreach ($options as $key => $val) {
             if (is_int($key)) {
@@ -343,8 +354,12 @@ class Pdf
             }
             $ext = '.html';
         }
+
         $file = new File($input, $ext, self::TMP_PREFIX, $this->tmpDir);
+        $file->delete = $this->tmpDelete;
+
         $this->_tmpFiles[] = $file;
+
         return $file;
     }
 
