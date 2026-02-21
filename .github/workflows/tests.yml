@@ -29,8 +29,8 @@ jobs:
       - name: Install wkhtmltopdf
         run: |
           cd /tmp
-          sudo wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb
-          sudo apt install -y -q ./wkhtmltox_0.12.6-1.focal_amd64.deb
+          sudo wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb
+          sudo apt install -y -q ./wkhtmltox_0.12.6.1-3.jammy_amd64.deb
           wkhtmltopdf --version
 
       - name: Install PHP
