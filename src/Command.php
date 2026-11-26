@@ -103,4 +103,26 @@ class Command extends BaseCommand
         }
         return $command;
     }
+
+    /**
+     * Execute the command. If the shell can't find or run the binary, the
+     * error message names the binary and says what to check.
+     *
+     * @return bool whether the command was executed successfully
+     */
+    public function execute()
+    {
+        $result = parent::execute();
+        if (!$result && !$this->enableXvfb) {
+            $binary = $this->getCommand();
+            $error = $this->getError();
+            // 127 and 126 are the shell's exit codes for "not found" and "not executable"
+            if ($this->getExitCode() === 127) {
+                $this->_error = "Could not find '$binary'. Install it or set the 'binary' option to its full path. ($error)";
+            } elseif ($this->getExitCode() === 126) {
+                $this->_error = "Could not run '$binary'. Check that the PHP user is allowed to execute it. ($error)";
+            }
+        }
+        return $result;
+    }
 }

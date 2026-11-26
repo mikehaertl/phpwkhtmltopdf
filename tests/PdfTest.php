@@ -524,6 +524,32 @@ class PdfTest extends TestCase
         unlink($outFile);
     }
 
+    // Errors
+    public function testErrorNamesBinaryIfNotFound()
+    {
+        $inFile = $this->getHtmlAsset();
+        $outFile = $this->getOutFile();
+        $binary = '/no/such/dir/wkhtmltopdf';
+
+        $pdf = new Pdf($inFile);
+        $pdf->binary = $binary;
+        $this->assertFalse($pdf->saveAs($outFile));
+        $this->assertStringStartsWith("Could not find '$binary'.", $pdf->getError());
+    }
+
+    public function testErrorNamesBinaryIfNotExecutable()
+    {
+        $inFile = $this->getHtmlAsset();
+        $outFile = $this->getOutFile();
+        $binary = tempnam(sys_get_temp_dir(), 'wkhtmltopdf');   // A file that can't be executed
+
+        $pdf = new Pdf($inFile);
+        $pdf->binary = $binary;
+        $this->assertFalse($pdf->saveAs($outFile));
+        $this->assertStringStartsWith("Could not run '$binary'.", $pdf->getError());
+        unlink($binary);
+    }
+
 
     protected function getBinary()
     {
