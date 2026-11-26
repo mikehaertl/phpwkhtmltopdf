@@ -232,6 +232,16 @@ if ($content === false) {
 }
 ```
 
+## Troubleshooting
+
+Some errors from `getError()` and what to do:
+
+ * **Could not find 'wkhtmltopdf'**: PHP can't find the binary. Set its full path with the `binary` option,
+   for example `/usr/local/bin/wkhtmltopdf`.
+ * **Could not run 'wkhtmltopdf'**: the file exists, but the PHP user is not allowed to execute it.
+ * **Could not run command** (since PHP 8: `Call to undefined function mikehaertl\shellcommand\proc_open()`):
+   PHP can't start other programs. Remove `proc_open` from `disable_functions` in your `php.ini`.
+
 ## Known Issues
 
 ### Use under Windows
