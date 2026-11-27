@@ -378,6 +378,32 @@ $pdf = new Pdf(array(
 ));
 ```
 
+#### No apt package on Debian 13 and Ubuntu 25.04+
+
+On these systems `apt install wkhtmltopdf` fails with `E: Package 'wkhtmltopdf' has no installation candidate`.
+Install wkhtmltopdf's last official package instead. Run the two lines for your system:
+
+```
+# Debian 12 or 13
+wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bookworm_amd64.deb
+sudo apt install -y ./wkhtmltox_0.12.6.1-3.bookworm_amd64.deb
+
+# Ubuntu 22.04 or newer
+wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb
+sudo apt install -y ./wkhtmltox_0.12.6.1-3.jammy_amd64.deb
+```
+
+Then `wkhtmltopdf --version` prints `wkhtmltopdf 0.12.6.1 (with patched qt)`.
+
+wkhtmltopdf itself is archived and gets no more fixes. A maintained drop-in is
+[marqius-wkhtmltopdf](https://github.com/marqiushq/marqius-wkhtmltopdf), free for personal and open-source projects
+and paid for businesses. Install it with `composer require marqius/wkhtmltopdf`, then pass its path:
+
+```php
+<?php
+$pdf = new Pdf(array('binary' => Marqius\Wkhtmltopdf\Binary::path()));
+```
+
 ## Full example
 
 For me `wkhtmltopdf` seems to create best results with smart shrinking turned off.
